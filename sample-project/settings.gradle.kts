@@ -2,6 +2,7 @@ rootProject.name = "App"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             mavenContent {
@@ -30,5 +31,4 @@ dependencyResolutionManagement {
 
 include(":android-app")
 include(":kmp-libraries:feature-a")
-include(":kmp-libraries:data-a")
 include(":ios:kmp-umbrella")

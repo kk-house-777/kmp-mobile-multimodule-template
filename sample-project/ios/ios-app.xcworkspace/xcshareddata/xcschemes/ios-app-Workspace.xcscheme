@@ -28,20 +28,6 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "97F0506600870BE6D39F6B5C"
-               BuildableName = "Feature_b.framework"
-               BlueprintName = "Feature-b"
-               ReferencedContainer = "container:ios-app.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "33FE20A58D1391962B6A8923"
                BuildableName = "KMPFramework.framework"
                BlueprintName = "KMPFramework"

@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import app.android_app.generated.resources.Res
 import app.android_app.generated.resources.compose_multiplatform
+import kk.tuist.app.feature.a.FeatureAScreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -39,6 +40,7 @@ fun App() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Image(painterResource(Res.drawable.compose_multiplatform), null)
+                    Text("KMP: ${FeatureAScreen()}")
                 }
             }
         }

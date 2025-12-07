@@ -13,7 +13,7 @@ public struct FeatureAView: View {
             Text("Feature A")
                 .font(.largeTitle)
                 .fontWeight(.bold)
-            Text("kmp Data-a: \(DataARepository())")
+            Text("kmp Data-a: \(FeatureAScreen())")
                 .font(.caption)
                 .foregroundColor(.blue)
         }
