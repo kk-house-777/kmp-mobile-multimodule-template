@@ -1,5 +1,6 @@
 # CLAUDE.md
 
+当資料は英語で記載しますが、特別事情がなければ出力は日本語にしてください。
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Overview
