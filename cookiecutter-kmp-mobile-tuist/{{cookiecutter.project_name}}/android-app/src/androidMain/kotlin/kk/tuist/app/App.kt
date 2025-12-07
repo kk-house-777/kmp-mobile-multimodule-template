@@ -1,4 +1,4 @@
-package kk.tuist.app
+package {{ cookiecutter.bundle_id_prefix }}
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -13,9 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import app.android_app.generated.resources.Res
-import app.android_app.generated.resources.compose_multiplatform
-import kk.tuist.app.feature.FeatureScreen
+import {{ cookiecutter.project_name|lower|replace('-', '_')|replace(' ', '_') }}.android_app.generated.resources.Res
+import {{ cookiecutter.project_name|lower|replace('-', '_')|replace(' ', '_') }}.android_app.generated.resources.compose_multiplatform
+import {{ cookiecutter.bundle_id_prefix }}.feature.FeatureScreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 

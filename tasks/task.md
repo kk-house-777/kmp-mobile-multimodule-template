@@ -1,0 +1,2 @@
+`sample-project`への変更がtemplateに反映する仕組みが欲しい。templateの置換部分に影響を及ぼさない前提の変更です。
+さらにそれを sample-project の変更を含む main へのpush や マージで github actionが動いて自動で反映されると良い

@@ -1,0 +1,15 @@
+{
+  "project_name": "App",
+  "android_app_name": "{{ cookiecutter.project_name }}",
+  "ios_app_name": "{{ cookiecutter.project_name }}",
+  "bundle_id_prefix": "com.example.app",
+  "_copy_without_render": [
+    "*.jar",
+    "*.png",
+    "*.jpg",
+    "*.jpeg",
+    "*.gif",
+    "*.svg",
+    "gradle/wrapper/*"
+  ]
+}

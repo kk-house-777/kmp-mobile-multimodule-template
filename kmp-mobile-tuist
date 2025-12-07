@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# kmp-mobile-tuist - CLI tool for creating KMP + Tuist mobile projects
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATE_DIR="$SCRIPT_DIR/cookiecutter-kmp-mobile-tuist"
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+function print_usage() {
+    cat << EOF
+kmp-mobile-tuist - CLI tool for creating KMP + Tuist mobile projects
+
+Usage:
+  kmp-mobile-tuist create [OPTIONS]
+
+Commands:
+  create              Create a new KMP + Tuist project from template
+  --help, -h          Show this help message
+
+Options for 'create':
+  --project-name NAME         Project name (default: App)
+  --bundle-id ID              Bundle ID prefix (default: com.example.app)
+  --android-app-name NAME     Android app name (default: same as project-name)
+  --ios-app-name NAME         iOS app name (default: same as project-name)
+  --output-dir DIR            Output directory (default: current directory)
+  --no-input                  Use default values without prompting
+
+Examples:
+  # Interactive mode
+  kmp-mobile-tuist create
+
+  # With arguments
+  kmp-mobile-tuist create --project-name MyApp --bundle-id com.mycompany.myapp
+
+  # Non-interactive mode
+  kmp-mobile-tuist create --project-name MyApp --bundle-id com.mycompany.myapp --no-input
+
+EOF
+}
+
+function check_cookiecutter() {
+    if ! command -v cookiecutter &> /dev/null; then
+        echo -e "${RED}Error: cookiecutter is not installed${NC}"
+        echo ""
+        echo "Please install cookiecutter first:"
+        echo "  pip install cookiecutter"
+        echo ""
+        echo "Or using Homebrew:"
+        echo "  brew install cookiecutter"
+        echo ""
+        exit 1
+    fi
+}
+
+function create_project() {
+    local project_name=""
+    local bundle_id=""
+    local android_app_name=""
+    local ios_app_name=""
+    local output_dir="."
+    local no_input=false
+    local extra_context=""
+
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --project-name)
+                project_name="$2"
+                shift 2
+                ;;
+            --bundle-id)
+                bundle_id="$2"
+                shift 2
+                ;;
+            --android-app-name)
+                android_app_name="$2"
+                shift 2
+                ;;
+            --ios-app-name)
+                ios_app_name="$2"
+                shift 2
+                ;;
+            --output-dir)
+                output_dir="$2"
+                shift 2
+                ;;
+            --no-input)
+                no_input=true
+                shift
+                ;;
+            *)
+                echo -e "${RED}Unknown option: $1${NC}"
+                print_usage
+                exit 1
+                ;;
+        esac
+    done
+
+    # Check if cookiecutter is installed
+    check_cookiecutter
+
+    # Build cookiecutter command
+    local cookiecutter_cmd="cookiecutter \"$TEMPLATE_DIR\""
+
+    if [[ "$no_input" == true ]]; then
+        cookiecutter_cmd="$cookiecutter_cmd --no-input"
+    fi
+
+    if [[ -n "$project_name" ]]; then
+        extra_context="project_name=$project_name"
+    fi
+
+    if [[ -n "$bundle_id" ]]; then
+        if [[ -n "$extra_context" ]]; then
+            extra_context="$extra_context,bundle_id_prefix=$bundle_id"
+        else
+            extra_context="bundle_id_prefix=$bundle_id"
+        fi
+    fi
+
+    if [[ -n "$android_app_name" ]]; then
+        if [[ -n "$extra_context" ]]; then
+            extra_context="$extra_context,android_app_name=$android_app_name"
+        else
+            extra_context="android_app_name=$android_app_name"
+        fi
+    fi
+
+    if [[ -n "$ios_app_name" ]]; then
+        if [[ -n "$extra_context" ]]; then
+            extra_context="$extra_context,ios_app_name=$ios_app_name"
+        else
+            extra_context="ios_app_name=$ios_app_name"
+        fi
+    fi
+
+    if [[ -n "$extra_context" ]]; then
+        cookiecutter_cmd="$cookiecutter_cmd --extra-context '$extra_context'"
+    fi
+
+    if [[ "$output_dir" != "." ]]; then
+        cookiecutter_cmd="$cookiecutter_cmd --output-dir \"$output_dir\""
+    fi
+
+    # Run cookiecutter
+    echo -e "${GREEN}Creating new KMP + Tuist project...${NC}"
+    echo ""
+    eval "$cookiecutter_cmd"
+}
+
+# Main script logic
+case "${1:-}" in
+    create)
+        shift
+        create_project "$@"
+        ;;
+    --help|-h|help)
+        print_usage
+        exit 0
+        ;;
+    "")
+        echo -e "${RED}Error: No command specified${NC}"
+        echo ""
+        print_usage
+        exit 1
+        ;;
+    *)
+        echo -e "${RED}Error: Unknown command '$1'${NC}"
+        echo ""
+        print_usage
+        exit 1
+        ;;
+esac
