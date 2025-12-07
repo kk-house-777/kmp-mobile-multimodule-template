@@ -5,15 +5,15 @@
 import SwiftUI
 import KMPFramework
 
-public struct FeatureAView: View {
+public struct FeatureView: View {
     public init() {}
 
     public var body: some View {
         VStack(spacing: 20) {
-            Text("Feature A")
+            Text("Feature")
                 .font(.largeTitle)
                 .fontWeight(.bold)
-            Text("kmp Data-a: \(FeatureAScreen())")
+            Text("kmp : \(FeatureScreen())")
                 .font(.caption)
                 .foregroundColor(.blue)
         }

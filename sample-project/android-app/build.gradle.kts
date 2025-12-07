@@ -18,7 +18,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-            implementation(projects.kmpLibraries.featureA)
+            implementation(projects.kmpLibraries.feature)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

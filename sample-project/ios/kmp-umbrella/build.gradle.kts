@@ -10,13 +10,13 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
-            export(projects.kmpLibraries.featureA)
+            export(projects.kmpLibraries.feature)
         }
     }
 
     sourceSets {
         commonMain.dependencies {
-            api(projects.kmpLibraries.featureA)
+            api(projects.kmpLibraries.feature)
         }
     }
 }

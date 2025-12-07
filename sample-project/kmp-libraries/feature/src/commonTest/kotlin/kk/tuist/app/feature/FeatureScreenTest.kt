@@ -1,18 +1,15 @@
-package kk.tuist.app.feature.a
+package kk.tuist.app.feature
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-
-class FeatureAScreenTest {
+class FeatureScreenTest {
     @Test
     fun testGetTitle() {
-        val screen = FeatureAScreen()
+        val screen = FeatureScreen()
         assertEquals("Feature A Screen", screen.getTitle())
     }
 
     @Test
     fun testGetSampleData() {
-        val screen = FeatureAScreen()
+        val screen = FeatureScreen()
         val data = screen.getSampleData()
         assertEquals("feature-a-001", data.id)
         assertEquals("Sample Feature A", data.name)

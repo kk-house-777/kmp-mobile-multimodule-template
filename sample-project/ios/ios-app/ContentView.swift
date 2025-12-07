@@ -1,10 +1,10 @@
 import SwiftUI
-import Feature_a
+import Feature
 
 struct ContentView: View {
     @State private var showContent = false
     var body: some View {
-        FeatureAView()
+        FeatureView()
     }
 }
 

@@ -30,5 +30,5 @@ dependencyResolutionManagement {
 }
 
 include(":android-app")
-include(":kmp-libraries:feature-a")
+include(":kmp-libraries:feature")
 include(":ios:kmp-umbrella")

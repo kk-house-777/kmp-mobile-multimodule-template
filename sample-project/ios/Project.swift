@@ -24,7 +24,7 @@ let project = Project(
             sources: ["ios-app/**"],
             resources: ["ios-app/**"],
             dependencies: [
-                .target(name: "Feature-a"),
+                .target(name: "Feature"),
             ]
         ),
         .target(
@@ -48,11 +48,11 @@ let project = Project(
             ])
         ),
         .target(
-            name: "Feature-a",
+            name: "Feature",
             destinations: .iOS,
             product: .framework,
-            bundleId: "\(bundleId).feature.a",
-            sources: ["Feature-a/**"],
+            bundleId: "\(bundleId).feature",
+            sources: ["Feature/**"],
             dependencies: [
                 .target(name: "KMPFramework")
             ]

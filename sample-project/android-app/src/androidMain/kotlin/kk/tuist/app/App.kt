@@ -40,7 +40,7 @@ fun App() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("KMP: ${FeatureAScreen()}")
+                    Text("KMP: ${FeatureScreen()}")
                 }
             }
         }

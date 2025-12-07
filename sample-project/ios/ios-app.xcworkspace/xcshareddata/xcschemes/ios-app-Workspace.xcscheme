@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3B44B85651061F0CBF62D4B3"
-               BuildableName = "Feature_a.framework"
-               BlueprintName = "Feature-a"
+               BlueprintIdentifier = "39048204D789B52355D93E05"
+               BuildableName = "Feature.framework"
+               BlueprintName = "Feature"
                ReferencedContainer = "container:ios-app.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -71,9 +71,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3B44B85651061F0CBF62D4B3"
-            BuildableName = "Feature_a.framework"
-            BlueprintName = "Feature-a"
+            BlueprintIdentifier = "39048204D789B52355D93E05"
+            BuildableName = "Feature.framework"
+            BlueprintName = "Feature"
             ReferencedContainer = "container:ios-app.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -87,9 +87,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3B44B85651061F0CBF62D4B3"
-            BuildableName = "Feature_a.framework"
-            BlueprintName = "Feature-a"
+            BlueprintIdentifier = "39048204D789B52355D93E05"
+            BuildableName = "Feature.framework"
+            BlueprintName = "Feature"
             ReferencedContainer = "container:ios-app.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
