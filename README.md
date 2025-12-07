@@ -88,10 +88,10 @@ cd MyApp
 mise install
 
 # Androidアプリをビルド
-./gradlew build
+./gradlew android-app:build
 
 # iOSプロジェクトを生成
-cd ios && tuist generate
+mise run ios-gen
 ```
 
 ## テンプレート変数
