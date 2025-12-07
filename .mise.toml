@@ -5,11 +5,18 @@ python = "3.12"
 [env]
 _.python.venv = { path = ".venv", create = true }
 
-# Install Python dependencies from requirements.txt
-[tasks.install]
-description = "Install Python dependencies (cookiecutter, etc.)"
-run = "pip install -r requirements.txt"
-
 [tasks.create]
 description = "Create a new KMP + Tuist project from template"
 run = "./kmp-mobile-tuist create"
+
+### ONE-TIME SETUP TASKS ###
+# Install Python dependencies from requirements.txt
+[tasks.python-install]
+description = "Install Python dependencies (cookiecutter, etc.)"
+run = "pip install -r requirements.txt"
+
+[tasks.install-spec-kit]
+description = "Install spec-kit from GitHub"
+run = "pip install git+https://github.com/github/spec-kit.git"
+depends = ["python-install"]
+
