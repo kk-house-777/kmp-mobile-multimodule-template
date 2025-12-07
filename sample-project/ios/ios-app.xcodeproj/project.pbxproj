@@ -3,11 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		041C29F8BD15094A41A68C8F /* Feature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 733A54E62276B02DD6E6894E /* Feature.framework */; };
+		26EEB3095FE1C24E7C33D259 /* FeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600FFA0710C23EDA3FCA9F85 /* FeatureView.swift */; };
 		408E5F60F73777AF35BEDE77 /* iOSApp.swift in Resources */ = {isa = PBXBuildFile; fileRef = BCB521EF95083CCDC3DB351D /* iOSApp.swift */; };
 		6F153DB640AB7F1C9A7483D4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A4FCF0A81BF8FBD17D57D72 /* Assets.xcassets */; };
 		800A0795A2F7145042901588 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1440446E6794FFFCB1D192E /* ContentView.swift */; };
@@ -18,7 +19,6 @@
 		BF2344A464C56593017A4A96 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4F6646D671B743A891E8EC24 /* Preview Assets.xcassets */; };
 		C77928BD293E58BA42F84625 /* KMPFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3E594F9C67583494DB08353 /* KMPFramework.framework */; };
 		CBA6C3FF4057013838BD1DF8 /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB521EF95083CCDC3DB351D /* iOSApp.swift */; };
-		CE92C5065EAD38C50C261E29 /* FeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F1E88F64D1EE09943C703A /* FeatureView.swift */; };
 		ED0E141A6AAF1B8B107A9D40 /* KMPFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C3E594F9C67583494DB08353 /* KMPFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F2B13B295DE8EF96EC393256 /* KmpFramework.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36EFA29666CA2D8D90489AF4 /* KmpFramework.swift */; };
 /* End PBXBuildFile section */
@@ -81,8 +81,8 @@
 		36EFA29666CA2D8D90489AF4 /* KmpFramework.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KmpFramework.swift; sourceTree = "<group>"; };
 		3F4BB24710085A22E9466FFA /* KMPFramework-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "KMPFramework-Info.plist"; sourceTree = "<group>"; };
 		4F6646D671B743A891E8EC24 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		600FFA0710C23EDA3FCA9F85 /* FeatureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureView.swift; sourceTree = "<group>"; };
 		733A54E62276B02DD6E6894E /* Feature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Feature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		83F1E88F64D1EE09943C703A /* FeatureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureView.swift; sourceTree = "<group>"; };
 		8CB7760ACA95DC73597125B7 /* Feature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Feature-Info.plist"; sourceTree = "<group>"; };
 		9A4FCF0A81BF8FBD17D57D72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AABF105587A2F09DA684254C /* ios-app-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ios-app-Info.plist"; sourceTree = "<group>"; };
@@ -170,7 +170,7 @@
 		C3F849C8935B9F890A3284C8 /* Feature */ = {
 			isa = PBXGroup;
 			children = (
-				83F1E88F64D1EE09943C703A /* FeatureView.swift */,
+				600FFA0710C23EDA3FCA9F85 /* FeatureView.swift */,
 			);
 			path = Feature;
 			sourceTree = "<group>";
@@ -294,6 +294,8 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 4E02D9E7D979ADC62A5E35A5 /* Build configuration list for PBXProject "ios-app" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -369,7 +371,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE92C5065EAD38C50C261E29 /* FeatureView.swift in Sources */,
+				26EEB3095FE1C24E7C33D259 /* FeatureView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -493,7 +495,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -521,7 +526,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -657,10 +665,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					shared,
-				);
+				OTHER_LDFLAGS = "-framework shared";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER).kmp.framework";
 				PRODUCT_NAME = KMPFramework;
 				SDKROOT = iphoneos;
@@ -668,7 +673,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -695,10 +703,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					shared,
-				);
+				OTHER_LDFLAGS = "-framework shared";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PRODUCT_BUNDLE_IDENTIFIER).kmp.framework";
 				PRODUCT_NAME = KMPFramework;
 				SDKROOT = iphoneos;
