@@ -1,0 +1,17 @@
+[tools]
+tuist = "4.109.2"
+
+[tasks.ios-gen]
+description = "Generate an iOS project"
+dir = "ios"
+run = "tuist generate"
+
+[tasks.ios-edit]
+description = "Edit Tuist manifests"
+dir = "ios"
+run = "tuist edit"
+
+[tasks.ios-clean]
+description = "Clean an iOS project"
+dir = "ios"
+run = "tuist clean"
