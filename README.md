@@ -129,3 +129,28 @@ mise run ios-gen
 - `cookiecutter-kmp-mobile-tuist/hooks/pre_gen_project.py`: 生成前のバリデーション
 - `cookiecutter-kmp-mobile-tuist/hooks/post_gen_project.py`: 生成後の処理
 - `cookiecutter-kmp-mobile-tuist/{{cookiecutter.project_name}}/`: テンプレートファイル本体
+
+## Sample Project から Template への同期
+
+`sample-project/`への変更を`cookiecutter-kmp-mobile-tuist/{{cookiecutter.project_name}}/`に自動的に反映するツールが用意されています。
+
+### 手動同期
+
+```bash
+# 最新の変更を同期
+./scripts/sync-sample-to-template.sh
+
+# ドライランモード(確認のみ)
+./scripts/sync-sample-to-template.sh --dry-run
+
+# 詳細ログ付き
+./scripts/sync-sample-to-template.sh --verbose
+```
+
+### 自動同期
+
+`main`ブランチへの`sample-project/**`の変更がpushされると、GitHub Actionsが自動的に同期を実行します。
+
+**重要**: このツールはJinja2テンプレート変数(`{{ cookiecutter.* }}`)を自動的に保護し、誤って上書きすることを防ぎます。
+
+詳細は[クイックスタートガイド](./specs/001-sample-to-template-sync/quickstart.md)を参照してください。
