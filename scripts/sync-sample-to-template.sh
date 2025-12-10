@@ -44,6 +44,7 @@ readonly COLOR_BLUE='\033[0;34m'
 DRY_RUN=false
 VERBOSE=false
 COMMIT_RANGE="HEAD~1..HEAD"
+USE_WORKING_TREE=false
 
 # Counters for reporting
 declare -i TOTAL_FILES=0
@@ -71,6 +72,7 @@ Jinja2テンプレート変数を保護し、誤って上書きすることを�
 オプション:
   --dry-run          実際には変更せず、同期内容のみ表示
   --commit HASH      変更検出のコミット範囲を指定 (デフォルト: HEAD~1..HEAD)
+  --working-tree     未コミットの変更(working tree)を同期対象にする
   --verbose          詳細ログを出力
   --help             このヘルプを表示
 
@@ -88,6 +90,9 @@ Jinja2テンプレート変数を保護し、誤って上書きすることを�
 
   # 特定のコミット範囲を指定
   ./scripts/sync-sample-to-template.sh --commit main..HEAD
+
+  # 未コミットの変更を同期
+  ./scripts/sync-sample-to-template.sh --working-tree
 
   # 詳細ログ付きで実行
   ./scripts/sync-sample-to-template.sh --verbose
@@ -298,6 +303,10 @@ main() {
                 COMMIT_RANGE="$2"
                 shift 2
                 ;;
+            --working-tree)
+                USE_WORKING_TREE=true
+                shift
+                ;;
             --verbose)
                 VERBOSE=true
                 shift
@@ -332,10 +341,21 @@ main() {
     log "Analyzing changes in $SAMPLE_PROJECT_DIR/..."
 
     local changed_files
-    changed_files=$(git diff --name-status "$COMMIT_RANGE" -- "$SAMPLE_PROJECT_DIR/" 2>/dev/null) || {
-        log_error "Failed to get git diff. Make sure you're in a git repository and the commit range is valid."
-        exit 2
-    }
+    if [[ "$USE_WORKING_TREE" == "true" ]]; then
+        # Check both staged and unstaged changes in working tree
+        log_verbose "Using working tree changes (staged + unstaged)"
+        changed_files=$(git diff --name-status HEAD -- "$SAMPLE_PROJECT_DIR/" 2>/dev/null) || {
+            log_error "Failed to get git diff. Make sure you're in a git repository."
+            exit 2
+        }
+    else
+        # Use commit range
+        log_verbose "Using commit range: $COMMIT_RANGE"
+        changed_files=$(git diff --name-status "$COMMIT_RANGE" -- "$SAMPLE_PROJECT_DIR/" 2>/dev/null) || {
+            log_error "Failed to get git diff. Make sure you're in a git repository and the commit range is valid."
+            exit 2
+        }
+    fi
 
     # Count total files
     TOTAL_FILES=$(echo "$changed_files" | grep -c "^[AMD]" || true)
