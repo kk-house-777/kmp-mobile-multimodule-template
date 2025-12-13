@@ -8,15 +8,37 @@
 # 3. No Jinja2 syntax errors were introduced
 #
 # Usage:
-#   ./tests/sync-sample-to-template/test_template_generation.sh
+#   ./tests/sync-sample-to-template/test_template_generation.sh [--no-color]
+#
+# Options:
+#   --no-color   Disable colored output
 
 set -euo pipefail
 
+# Detect --no-color flag or non-TTY output
+USE_COLOR=1
+for arg in "$@"; do
+    if [[ "$arg" == "--no-color" ]]; then
+        USE_COLOR=0
+        break
+    fi
+done
+if [[ ! -t 1 ]]; then
+    USE_COLOR=0
+fi
+
 # Colors for output
-readonly COLOR_GREEN='\033[0;32m'
-readonly COLOR_RED='\033[0;31m'
-readonly COLOR_BLUE='\033[0;34m'
-readonly COLOR_RESET='\033[0m'
+if [[ "$USE_COLOR" -eq 1 ]]; then
+    readonly COLOR_GREEN='\033[0;32m'
+    readonly COLOR_RED='\033[0;31m'
+    readonly COLOR_BLUE='\033[0;34m'
+    readonly COLOR_RESET='\033[0m'
+else
+    readonly COLOR_GREEN=''
+    readonly COLOR_RED=''
+    readonly COLOR_BLUE=''
+    readonly COLOR_RESET=''
+fi
 
 # Get repository root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -136,7 +158,7 @@ fi
 echo ""
 
 # Optional: Try to run Gradle tasks if Gradle is available
-if command -v ./gradlew &> /dev/null || command -v gradle &> /dev/null; then
+if [[ -x ./gradlew ]] || command -v gradle &> /dev/null; then
     echo -e "${COLOR_BLUE}Running Gradle validation...${COLOR_RESET}"
 
     cd "$PROJECT_DIR"

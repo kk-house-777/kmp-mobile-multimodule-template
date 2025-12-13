@@ -18,8 +18,8 @@ setup() {
     # Initialize git repo in test directory
     cd "$TEST_DIR"
     git init
-    git config user.name "Test User"
-    git config user.email "test@example.com"
+    git config user.name "Test User" || { echo "ERROR: git config user.name failed" >&2; exit 1; }
+    git config user.email "test@example.com" || { echo "ERROR: git config user.email failed" >&2; exit 1; }
 
     # Create sample structure
     mkdir -p "$TEST_SAMPLE"
@@ -79,14 +79,14 @@ teardown() {
 
     # Check that file was synced to correct location
     [ -f "$TEST_TEMPLATE/test.txt" ]
-    [ "$(cat $TEST_TEMPLATE/test.txt)" = "modified" ]
+    [ "$(cat "$TEST_TEMPLATE/test.txt")" = "modified" ]
 }
 
 @test "Jinja2 variable detection protects template files" {
     cd "$TEST_DIR"
 
     # Create destination file with Jinja2 variables
-    mkdir -p "$(dirname $TEST_TEMPLATE/protected.txt)"
+    mkdir -p "$(dirname "$TEST_TEMPLATE/protected.txt")"
     echo "Value: {{ cookiecutter.project_name }}" > "$TEST_TEMPLATE/protected.txt"
 
     # Create source file
@@ -104,7 +104,7 @@ teardown() {
     [ "$status" -eq 0 ]
 
     # Template file should still contain Jinja2 variable
-    [[ "$(cat $TEST_TEMPLATE/protected.txt)" =~ "cookiecutter.project_name" ]]
+    [[ "$(cat "$TEST_TEMPLATE/protected.txt")" =~ "cookiecutter.project_name" ]]
 
     # Output should mention skip
     [[ "$output" =~ "SKIP" ]]
@@ -258,5 +258,5 @@ teardown() {
     [ "$status" -eq 0 ]
 
     # Template should have v2, not v3
-    [ "$(cat $TEST_TEMPLATE/range.txt)" = "v2" ]
+    [ "$(cat "$TEST_TEMPLATE/range.txt")" = "v2" ]
 }

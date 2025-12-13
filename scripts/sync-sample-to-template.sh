@@ -21,6 +21,9 @@
 
 set -euo pipefail
 
+# Trap errors and provide helpful message
+trap 'echo -e "\033[0;31m[sync-template:ERROR]\033[0m Script failed at line $LINENO. Exit code: $?" >&2' ERR
+
 # ============================================================================
 # Configuration
 # ============================================================================
@@ -151,8 +154,8 @@ has_jinja2_vars() {
 
     # Check for Jinja2 patterns: {{, {%, {#
     # Use grep -q for quiet mode (only exit code matters)
-    # Ignore binary files (grep will skip them automatically with -I)
-    grep -qE '\{\{|\{%|\{#' "$file" 2>/dev/null
+    # Use -I to explicitly skip binary files
+    grep -IqE '\{\{|\{%|\{#' "$file" 2>/dev/null
 }
 
 #
@@ -300,6 +303,11 @@ main() {
                 shift
                 ;;
             --commit)
+                if [[ -z "${2:-}" ]] || [[ "${2:-}" == --* ]] || [[ "${2:-}" == -* ]]; then
+                    log_error "Missing commit range after --commit"
+                    usage
+                    exit 2
+                fi
                 COMMIT_RANGE="$2"
                 shift 2
                 ;;
@@ -399,9 +407,6 @@ main() {
         exit 0
     fi
 }
-
-# Trap errors and provide helpful message
-trap 'log_error "Script failed at line $LINENO. Exit code: $?"' ERR
 
 # Run main function
 main "$@"
