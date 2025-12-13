@@ -165,6 +165,74 @@ rootProject.name = "{{ cookiecutter.project_name }}"
 
 この場合、`settings.gradle.kts`は同期から**除外**され、template側の`{{ cookiecutter.project_name }}`が保持されます。
 
+### 行単位の保護（Cookiecutterマーカー）
+
+**v1.1.0以降**では、ファイル全体をスキップするのではなく、**特定の行やセクションだけ**を保護できるマーカー機能が追加されました。
+
+#### 1. インラインマーカー（1行の保護）
+
+特定の行だけを保護したい場合、行末に`// COOKIECUTTER_KEEP`コメントを追加します。
+
+**例: パッケージ宣言の保護**
+
+```kotlin
+// Template側ファイル
+package {{ cookiecutter.bundle_id_prefix }} // COOKIECUTTER_KEEP
+
+fun myFunction() {
+    println("Hello")
+}
+```
+
+この場合、同期実行時：
+- **1行目**: 保護される（Jinja2変数が保持される）
+- **3行目以降**: sample-projectから同期される
+
+#### 2. セクションマーカー（複数行の保護）
+
+複数行をまとめて保護したい場合、`COOKIECUTTER_PROTECTED_START`と`COOKIECUTTER_PROTECTED_END`で囲みます。
+
+**例: importセクションの保護**
+
+```kotlin
+// Template側ファイル
+// COOKIECUTTER_PROTECTED_START
+package {{ cookiecutter.bundle_id_prefix }}
+import {{ cookiecutter.project_name|lower }}.generated.resources.Res
+// COOKIECUTTER_PROTECTED_END
+
+fun myFunction() {
+    println("Hello")
+}
+```
+
+この場合、同期実行時：
+- **2-4行目**: 保護される（Jinja2変数が保持される）
+- **6行目以降**: sample-projectから同期される
+
+#### マーカー使用時の動作
+
+| ファイルの状態 | 動作 |
+|--------------|------|
+| マーカーあり + Jinja2変数あり | 行単位マージ（⚡マーク表示） |
+| マーカーなし + Jinja2変数あり | ファイル全体をスキップ（⊘マーク表示） |
+| Jinja2変数なし | ファイル全体を同期（✓マーク表示） |
+
+**出力例（マーカー使用時）:**
+```
+  ⚡ MERGED (line-level): sample-project/App.kt → cookiecutter-.../App.kt
+```
+
+#### 使用上の注意
+
+1. **マーカーはTemplate側にのみ配置**: sample-projectには不要
+2. **コメント形式を適切に選択**:
+   - Kotlin/Java: `// COOKIECUTTER_KEEP`
+   - Python: `# COOKIECUTTER_KEEP`
+   - XML: `<!-- COOKIECUTTER_KEEP -->`
+3. **セクションは正しく閉じる**: `START`と`END`のペアが必要
+4. **ネストは避ける**: セクション内に別のセクションを作らない
+
 ## よくあるワークフロー
 
 ### ワークフロー1: 新機能の追加

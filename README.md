@@ -153,4 +153,21 @@ mise run ios-gen
 
 **重要**: このツールはJinja2テンプレート変数(`{{ cookiecutter.* }}`)を自動的に保護し、誤って上書きすることを防ぎます。
 
+### 行単位の保護（マーカー機能）
+
+ファイル全体ではなく、特定の行やセクションだけを保護したい場合は、以下のマーカーを使用できます：
+
+```kotlin
+// インラインマーカー（1行保護）
+package {{ cookiecutter.bundle_id_prefix }} // COOKIECUTTER_KEEP
+
+// セクションマーカー（複数行保護）
+// COOKIECUTTER_PROTECTED_START
+package {{ cookiecutter.bundle_id_prefix }}
+import {{ cookiecutter.project_name|lower }}.generated.resources.Res
+// COOKIECUTTER_PROTECTED_END
+```
+
+マーカーを使用すると、保護された行はそのまま保持され、それ以外の行はsample-projectから同期されます。
+
 詳細は[クイックスタートガイド](./specs/001-sample-to-template-sync/quickstart.md)を参照してください。

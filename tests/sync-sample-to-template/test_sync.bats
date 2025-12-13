@@ -260,3 +260,260 @@ teardown() {
     # Template should have v2, not v3
     [ "$(cat "$TEST_TEMPLATE/range.txt")" = "v2" ]
 }
+
+@test "Inline marker (COOKIECUTTER_KEEP) protects single line" {
+    cd "$TEST_DIR"
+
+    # Create destination file with inline marker
+    mkdir -p "$(dirname "$TEST_TEMPLATE/inline.txt")"
+    cat > "$TEST_TEMPLATE/inline.txt" <<'EOF'
+package {{ cookiecutter.bundle_id_prefix }} // COOKIECUTTER_KEEP
+fun normalFunction() {
+    println("Hello")
+}
+EOF
+
+    # Create source file
+    cat > "$TEST_SAMPLE/inline.txt" <<'EOF'
+package com.example.app
+fun normalFunction() {
+    println("World")
+}
+EOF
+    git add .
+    git commit -m "Initial commit"
+
+    # Modify source file
+    cat > "$TEST_SAMPLE/inline.txt" <<'EOF'
+package com.example.app
+fun normalFunction() {
+    println("Modified!")
+}
+EOF
+    git add .
+    git commit -m "Modify file"
+
+    # Run sync
+    run "$SCRIPT"
+    [ "$status" -eq 0 ]
+
+    # First line should still have Jinja2 variable (protected)
+    head -n 1 "$TEST_TEMPLATE/inline.txt" | grep -q "cookiecutter.bundle_id_prefix"
+
+    # Second line should be updated from source
+    sed -n '2p' "$TEST_TEMPLATE/inline.txt" | grep -q "normalFunction"
+
+    # Third line should be updated
+    grep -q "Modified!" "$TEST_TEMPLATE/inline.txt"
+
+    # Output should mention merge
+    [[ "$output" =~ "MERGE" ]]
+}
+
+@test "Section markers (COOKIECUTTER_PROTECTED_START/END) protect multiple lines" {
+    cd "$TEST_DIR"
+
+    # Create destination file with section markers
+    mkdir -p "$(dirname "$TEST_TEMPLATE/section.kt")"
+    cat > "$TEST_TEMPLATE/section.kt" <<'EOF'
+// COOKIECUTTER_PROTECTED_START
+package {{ cookiecutter.bundle_id_prefix }}
+import {{ cookiecutter.project_name|lower }}.generated.resources.Res
+// COOKIECUTTER_PROTECTED_END
+
+fun myFunction() {
+    println("Original")
+}
+EOF
+
+    # Create source file
+    cat > "$TEST_SAMPLE/section.kt" <<'EOF'
+package com.example.app
+import com.example.app.generated.resources.Res
+
+fun myFunction() {
+    println("Modified")
+}
+EOF
+    git add .
+    git commit -m "Initial commit"
+
+    # Modify source file
+    cat > "$TEST_SAMPLE/section.kt" <<'EOF'
+package com.example.app
+import com.example.app.generated.resources.Res
+
+fun myFunction() {
+    println("Updated!")
+}
+EOF
+    git add .
+    git commit -m "Modify file"
+
+    # Run sync
+    run "$SCRIPT"
+    [ "$status" -eq 0 ]
+
+    # Protected section should still have Jinja2 variables
+    grep -q "cookiecutter.bundle_id_prefix" "$TEST_TEMPLATE/section.kt"
+    grep -q "cookiecutter.project_name" "$TEST_TEMPLATE/section.kt"
+
+    # Function should be updated from source
+    grep -q "Updated!" "$TEST_TEMPLATE/section.kt"
+
+    # Output should mention merge
+    [[ "$output" =~ "MERGE" ]]
+}
+
+@test "Markers work in dry-run mode" {
+    cd "$TEST_DIR"
+
+    # Create destination file with markers
+    mkdir -p "$(dirname "$TEST_TEMPLATE/marker-dry.txt")"
+    echo "package {{ cookiecutter.bundle_id_prefix }} // COOKIECUTTER_KEEP" > "$TEST_TEMPLATE/marker-dry.txt"
+
+    # Create and modify source
+    echo "package com.example.app" > "$TEST_SAMPLE/marker-dry.txt"
+    git add .
+    git commit -m "Initial commit"
+
+    echo "package com.example.updated" > "$TEST_SAMPLE/marker-dry.txt"
+    git add .
+    git commit -m "Modify file"
+
+    # Run in dry-run mode
+    run "$SCRIPT" --dry-run
+    [ "$status" -eq 0 ]
+
+    # Output should show would merge
+    [[ "$output" =~ "WOULD MERGE" ]]
+
+    # Template should be unchanged
+    grep -q "cookiecutter.bundle_id_prefix" "$TEST_TEMPLATE/marker-dry.txt"
+}
+
+@test "Mixed markers and regular Jinja2 - markers take precedence" {
+    cd "$TEST_DIR"
+
+    # Create file with both markers and regular Jinja2
+    mkdir -p "$(dirname "$TEST_TEMPLATE/mixed.txt")"
+    cat > "$TEST_TEMPLATE/mixed.txt" <<'EOF'
+package {{ cookiecutter.bundle_id_prefix }} // COOKIECUTTER_KEEP
+fun test() {
+    val name = "{{ cookiecutter.project_name }}"
+}
+EOF
+
+    # Create source
+    cat > "$TEST_SAMPLE/mixed.txt" <<'EOF'
+package com.example.app
+fun test() {
+    val name = "MyProject"
+}
+EOF
+    git add .
+    git commit -m "Initial commit"
+
+    # Modify source
+    cat > "$TEST_SAMPLE/mixed.txt" <<'EOF'
+package com.example.app
+fun test() {
+    val name = "UpdatedProject"
+}
+EOF
+    git add .
+    git commit -m "Modify file"
+
+    # Run sync
+    run "$SCRIPT"
+    [ "$status" -eq 0 ]
+
+    # First line protected by marker
+    head -n 1 "$TEST_TEMPLATE/mixed.txt" | grep -q "cookiecutter.bundle_id_prefix"
+
+    # Lines without markers should be updated
+    grep -q "UpdatedProject" "$TEST_TEMPLATE/mixed.txt"
+
+    # Should use merge, not skip
+    [[ "$output" =~ "MERGE" ]]
+}
+
+@test "Nested protected sections are handled correctly" {
+    cd "$TEST_DIR"
+
+    # Create file with nested markers (should not be nested, but test handling)
+    mkdir -p "$(dirname "$TEST_TEMPLATE/nested.txt")"
+    cat > "$TEST_TEMPLATE/nested.txt" <<'EOF'
+// COOKIECUTTER_PROTECTED_START
+line1: {{ cookiecutter.var1 }}
+// COOKIECUTTER_PROTECTED_START
+line2: {{ cookiecutter.var2 }}
+// COOKIECUTTER_PROTECTED_END
+line3: {{ cookiecutter.var3 }}
+// COOKIECUTTER_PROTECTED_END
+line4: normal
+EOF
+
+    # Create source
+    cat > "$TEST_SAMPLE/nested.txt" <<'EOF'
+line1: updated1
+line2: updated2
+line3: updated3
+line4: updated4
+EOF
+    git add .
+    git commit -m "Initial commit"
+
+    echo "modified" > "$TEST_SAMPLE/nested.txt"
+    git add .
+    git commit -m "Modify file"
+
+    # Run sync - should not crash
+    run "$SCRIPT"
+    [ "$status" -eq 0 ]
+
+    # All protected lines should remain
+    grep -q "cookiecutter.var1" "$TEST_TEMPLATE/nested.txt"
+}
+
+@test "Source longer than destination with markers" {
+    cd "$TEST_DIR"
+
+    # Create short destination with marker
+    mkdir -p "$(dirname "$TEST_TEMPLATE/longer.txt")"
+    cat > "$TEST_TEMPLATE/longer.txt" <<'EOF'
+line1: {{ cookiecutter.var }} // COOKIECUTTER_KEEP
+line2: original
+EOF
+
+    # Create longer source
+    cat > "$TEST_SAMPLE/longer.txt" <<'EOF'
+line1: source
+line2: updated
+line3: new
+line4: more
+EOF
+    git add .
+    git commit -m "Initial commit"
+
+    # Modify to make it even longer
+    cat > "$TEST_SAMPLE/longer.txt" <<'EOF'
+line1: source
+line2: updated
+line3: new
+line4: more
+line5: extra
+EOF
+    git add .
+    git commit -m "Modify file"
+
+    # Run sync
+    run "$SCRIPT"
+    [ "$status" -eq 0 ]
+
+    # First line should be protected
+    head -n 1 "$TEST_TEMPLATE/longer.txt" | grep -q "cookiecutter.var"
+
+    # Additional lines should be appended
+    grep -q "line5: extra" "$TEST_TEMPLATE/longer.txt"
+}

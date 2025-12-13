@@ -159,6 +159,108 @@ has_jinja2_vars() {
 }
 
 #
+# Check if file contains Cookiecutter protection markers
+# Args: file_path
+# Returns: 0 if markers found, 1 otherwise
+#
+has_cookiecutter_markers() {
+    local file="$1"
+
+    # Return false if file doesn't exist
+    [[ -f "$file" ]] || return 1
+
+    # Check for protection markers: COOKIECUTTER_PROTECTED_START/END or COOKIECUTTER_KEEP
+    grep -IqE 'COOKIECUTTER_(PROTECTED_START|PROTECTED_END|KEEP)' "$file" 2>/dev/null
+}
+
+#
+# Merge file with line-level protection (respecting COOKIECUTTER markers)
+# Args: source_file destination_file
+# Returns: 0 on success, 1 on skip, 2 on failure
+#
+merge_file_with_markers() {
+    local src="$1"
+    local dst="$2"
+    local temp_file="${dst}.tmp"
+    local src_line dst_line
+    local in_protected_section=false
+    local line_num=0
+
+    log_verbose "  Performing line-level merge with marker protection"
+
+    # Read source file into array
+    declare -a src_lines=()
+    while IFS= read -r src_line || [[ -n "$src_line" ]]; do
+        src_lines+=("$src_line")
+    done < "$src"
+
+    # Process destination file line by line
+    > "$temp_file"  # Create empty temp file
+
+    while IFS= read -r dst_line || [[ -n "$dst_line" ]]; do
+        ((line_num++))
+
+        # Check for section markers
+        if echo "$dst_line" | grep -qE 'COOKIECUTTER_PROTECTED_START'; then
+            in_protected_section=true
+            echo "$dst_line" >> "$temp_file"
+            log_verbose "    Line $line_num: Protected section START"
+            continue
+        fi
+
+        if echo "$dst_line" | grep -qE 'COOKIECUTTER_PROTECTED_END'; then
+            in_protected_section=false
+            echo "$dst_line" >> "$temp_file"
+            log_verbose "    Line $line_num: Protected section END"
+            continue
+        fi
+
+        # Check for inline marker
+        if echo "$dst_line" | grep -qE 'COOKIECUTTER_KEEP'; then
+            echo "$dst_line" >> "$temp_file"
+            log_verbose "    Line $line_num: KEPT (inline marker)"
+            continue
+        fi
+
+        # If in protected section, keep destination line
+        if [[ "$in_protected_section" == "true" ]]; then
+            echo "$dst_line" >> "$temp_file"
+            log_verbose "    Line $line_num: KEPT (in protected section)"
+            continue
+        fi
+
+        # Otherwise, use source line if available
+        if [[ $line_num -le ${#src_lines[@]} ]]; then
+            echo "${src_lines[$((line_num-1))]}" >> "$temp_file"
+            log_verbose "    Line $line_num: SYNCED from source"
+        else
+            # Source is shorter, keep destination line
+            echo "$dst_line" >> "$temp_file"
+            log_verbose "    Line $line_num: KEPT (source shorter)"
+        fi
+
+    done < "$dst"
+
+    # If source is longer than destination, append remaining lines
+    if [[ ${#src_lines[@]} -gt $line_num ]]; then
+        for (( i=$line_num; i<${#src_lines[@]}; i++ )); do
+            echo "${src_lines[$i]}" >> "$temp_file"
+            log_verbose "    Line $((i+1)): APPENDED from source"
+        done
+    fi
+
+    # Replace destination with merged content
+    if mv "$temp_file" "$dst"; then
+        log_verbose "  Merge completed successfully"
+        return 0
+    else
+        log_error "Failed to replace destination with merged content"
+        rm -f "$temp_file"
+        return 2
+    fi
+}
+
+#
 # Sync a single file from sample-project to template
 # Args: source_file change_type
 # Returns: 0 on success, 1 on skip, 2 on failure
@@ -174,9 +276,37 @@ sync_file() {
     log_verbose "  Source: $src"
     log_verbose "  Destination: $dst"
 
-    # Check if destination contains Jinja2 variables
+    # Check if destination has Cookiecutter markers → use line-level merge
+    if [[ -f "$dst" ]] && has_cookiecutter_markers "$dst"; then
+        log_verbose "  Cookiecutter markers detected in destination - will perform line-level merge"
+
+        # For delete operations, markers don't matter - still delete
+        if [[ "$change_type" == "D" ]]; then
+            log_verbose "  Delete operation - markers ignored"
+        else
+            # Perform marker-aware merge for A/M operations
+            if [[ "$DRY_RUN" == "true" ]]; then
+                echo -e "  ${COLOR_GREEN}⚡${COLOR_RESET} WOULD MERGE (line-level): $src → $dst"
+                ((SUCCESS_COUNT++))
+                return 0
+            else
+                if merge_file_with_markers "$src" "$dst"; then
+                    echo -e "  ${COLOR_GREEN}⚡${COLOR_RESET} MERGED (line-level): $src → $dst"
+                    ((SUCCESS_COUNT++))
+                    return 0
+                else
+                    log_error "Failed to merge: $src → $dst"
+                    FAILED_FILES+=("$src: merge operation failed")
+                    ((FAILED_COUNT++))
+                    return 2
+                fi
+            fi
+        fi
+    fi
+
+    # Check if destination contains Jinja2 variables (without markers) → skip entire file
     if [[ -f "$dst" ]] && has_jinja2_vars "$dst"; then
-        log_verbose "  Jinja2 variables detected in destination"
+        log_verbose "  Jinja2 variables detected in destination (no markers)"
         echo -e "  ${COLOR_YELLOW}⊘${COLOR_RESET} SKIP: $src (destination contains Jinja2 variables)"
         SKIPPED_FILES+=("$src: destination contains Jinja2 variables")
         ((SKIPPED_COUNT++))
