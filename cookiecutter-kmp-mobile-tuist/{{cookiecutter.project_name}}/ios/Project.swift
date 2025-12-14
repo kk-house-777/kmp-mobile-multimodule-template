@@ -19,8 +19,6 @@ let project = Project(
                         "UIColorName": "",
                         "UIImageName": "",
                     ],
-                    // CMP Integration
-                    "CADisableMinimumFrameDurationOnPhone": true
                 ]
             ),
             sources: ["ios-app/**"],
