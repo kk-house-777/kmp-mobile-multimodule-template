@@ -7,18 +7,18 @@ Create a multimodule template application for iOS and Android using KMP (Kotlin 
 ## Requirements
 - iOS project management is based on Tuist
 
-## Prerequisites
-- [mise](https://github.com/jdx/mise)
+## Installation
+
+```bash
+brew tap kk-house-777/tap
+brew install kmp-mobile-multimodule-template
+```
 
 ## Usage
 ### Quick Start
 ```bash
-# Install dependencies
-mise install
-mise run install
-
 # Create a test project from template
-mise run create
+kmp-mobile-multimodule-template create
 
 # Test the generated project
 cd <generated-project-name>
@@ -30,13 +30,16 @@ mise run ios-gen
 ### Create Project
 ```bash
 # Create test project (interactive)
-./kmp-mobile-tuist create
+kmp-mobile-multimodule-template create
 
 # Create test project (non-interactive)
-./kmp-mobile-tuist create \
+kmp-mobile-multimodule-template create \
   --project-name TestApp \
   --bundle-id com.test.app \
   --no-input
+
+# Show help
+kmp-mobile-multimodule-template --help
 ```
 
 # Development
@@ -48,11 +51,11 @@ This is a Cookiecutter-based template repository for generating Kotlin Multiplat
 
 ## How It Works
 ```
-% ./kmp-mobile-tuist --help
-kmp-mobile-tuist - CLI tool for creating KMP + Tuist mobile projects
+% kmp-mobile-multimodule-template --help
+kmp-mobile-multimodule-template - CLI tool for creating KMP + Tuist mobile projects
 
 Usage:
-  kmp-mobile-tuist create [OPTIONS]
+  kmp-mobile-multimodule-template create [OPTIONS]
 
 Commands:
   create              Create a new KMP + Tuist project from template
@@ -68,13 +71,13 @@ Options for 'create':
 
 Examples:
   # Interactive mode
-  kmp-mobile-tuist create
+  kmp-mobile-multimodule-template create
 
   # With arguments
-  kmp-mobile-tuist create --project-name MyApp --bundle-id com.mycompany.myapp
+  kmp-mobile-multimodule-template create --project-name MyApp --bundle-id com.mycompany.myapp
 
   # Non-interactive mode
-  kmp-mobile-tuist create --project-name MyApp --bundle-id com.mycompany.myapp --no-input
+  kmp-mobile-multimodule-template create --project-name MyApp --bundle-id com.mycompany.myapp --no-input
 ```
 
 ## Syncing Changes from sample-project to cookiecutter-kmp-mobile-tuist

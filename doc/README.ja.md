@@ -3,20 +3,20 @@ KMPを使ったiOS, Androidのマルチモジュール構成のtemplateアプリ
 ## 要件
 - iOSプロジェクトの管理はtuistが前提
 
-## 前提
-- [mise](https://github.com/jdx/mise)
+## インストール方法
+
+```bash
+brew tap kk-house-777/tap
+brew install kmp-mobile-multimodule-template
+```
 
 ## 使い方
 ### クイックスタート
 ```bash
-# Install dependencies
-mise install
-mise run install
+# テンプレートからプロジェクトを作成
+kmp-mobile-multimodule-template create
 
-# Create a test project from template
-mise run create
-
-# Test the generated project
+# 生成されたプロジェクトをテスト
 cd <generated-project-name>
 mise install
 ./gradlew android-app:build
@@ -25,14 +25,17 @@ mise run ios-gen
 
 ### create project
 ```bash
-# Create test project (interactive)
-./kmp-mobile-tuist create
+# テストプロジェクトを作成（対話モード）
+kmp-mobile-multimodule-template create
 
-# Create test project (non-interactive)
-./kmp-mobile-tuist create \
+# テストプロジェクトを作成（非対話モード）
+kmp-mobile-multimodule-template create \
   --project-name TestApp \
   --bundle-id com.test.app \
   --no-input
+
+# ヘルプを表示
+kmp-mobile-multimodule-template --help
 ```
 
 # Development
@@ -44,11 +47,11 @@ This is a Cookiecutter-based template repository for generating Kotlin Multiplat
 
 ## 仕組み
 ```
-% ./kmp-mobile-tuist --help
-kmp-mobile-tuist - CLI tool for creating KMP + Tuist mobile projects
+% kmp-mobile-multimodule-template --help
+kmp-mobile-multimodule-template - CLI tool for creating KMP + Tuist mobile projects
 
 Usage:
-  kmp-mobile-tuist create [OPTIONS]
+  kmp-mobile-multimodule-template create [OPTIONS]
 
 Commands:
   create              Create a new KMP + Tuist project from template
@@ -64,13 +67,13 @@ Options for 'create':
 
 Examples:
   # Interactive mode
-  kmp-mobile-tuist create
+  kmp-mobile-multimodule-template create
 
   # With arguments
-  kmp-mobile-tuist create --project-name MyApp --bundle-id com.mycompany.myapp
+  kmp-mobile-multimodule-template create --project-name MyApp --bundle-id com.mycompany.myapp
 
   # Non-interactive mode
-  kmp-mobile-tuist create --project-name MyApp --bundle-id com.mycompany.myapp --no-input
+  kmp-mobile-multimodule-template create --project-name MyApp --bundle-id com.mycompany.myapp --no-input
 ```
 
 ##  sample-projectの変更をcookiecutter-kmp-mobile-tuistに反映
