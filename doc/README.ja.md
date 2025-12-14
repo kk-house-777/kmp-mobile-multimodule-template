@@ -1,7 +1,7 @@
 # kmp-multimodule-template
 KMPを使ったiOS, Androidのマルチモジュール構成のtemplateアプリを作成する。
 ## 要件
-- iOSプロジェクトの管理はtuistが前提
+- iOSプロジェクトの管理は[Tuist](https://tuist.dev/)が前提
 
 ## インストール方法
 
@@ -13,19 +13,7 @@ brew install kmp-mobile-multimodule-template
 ## 使い方
 ### クイックスタート
 ```bash
-# テンプレートからプロジェクトを作成
-kmp-mobile-multimodule-template create
-
-# 生成されたプロジェクトをテスト
-cd <generated-project-name>
-mise install
-./gradlew android-app:build
-mise run ios-gen
-```
-
-### create project
-```bash
-# テストプロジェクトを作成（対話モード）
+# テンプレートからプロジェクトを作成（対話モード）
 kmp-mobile-multimodule-template create
 
 # テストプロジェクトを作成（非対話モード）
@@ -34,7 +22,15 @@ kmp-mobile-multimodule-template create \
   --bundle-id com.test.app \
   --no-input
 
-# ヘルプを表示
+# 生成されたプロジェクトをテスト
+cd <generated-project-name>
+mise install
+./gradlew android-app:build
+mise run ios-gen
+```
+
+### ヘルプを表示
+```bash
 kmp-mobile-multimodule-template --help
 ```
 

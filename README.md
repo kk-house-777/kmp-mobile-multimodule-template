@@ -5,7 +5,7 @@
 Create a multimodule template application for iOS and Android using KMP (Kotlin Multiplatform).
 
 ## Requirements
-- iOS project management is based on Tuist
+- iOS project management is based on [Tuist](https://tuist.dev/)
 
 ## Installation
 
@@ -17,8 +17,14 @@ brew install kmp-mobile-multimodule-template
 ## Usage
 ### Quick Start
 ```bash
-# Create a test project from template
+# Create a test project from template (interactive)
 kmp-mobile-multimodule-template create
+
+# Create a test project (non-interactive)
+kmp-mobile-multimodule-template create \
+  --project-name TestApp \
+  --bundle-id com.test.app \
+  --no-input
 
 # Test the generated project
 cd <generated-project-name>
@@ -27,18 +33,8 @@ mise install
 mise run ios-gen
 ```
 
-### Create Project
+### Show Help
 ```bash
-# Create test project (interactive)
-kmp-mobile-multimodule-template create
-
-# Create test project (non-interactive)
-kmp-mobile-multimodule-template create \
-  --project-name TestApp \
-  --bundle-id com.test.app \
-  --no-input
-
-# Show help
 kmp-mobile-multimodule-template --help
 ```
 
