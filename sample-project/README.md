@@ -40,31 +40,23 @@ sample-project/
 │   ├── KMPFramework/    # KMPコードのラッパーフレームワーク
 │   └── kmp-umbrella/    # KMPライブラリの公開インターフェース
 ├── kmp-libraries/        # 共有KMPライブラリ
-│   └── feature/         # ビジネスロジックとUI
+│   └── feature/         # 共通機能モジュール
 └── build-logic/          # Gradle Convention Plugins
 ```
-
-## アーキテクチャ
-
-### モジュール構成
 
 ```mermaid
 flowchart TD
     android-app
 
     subgraph kmp-libraries
-        feature-a
-        feature-b
-        data-a
-        data-b
+        feature
+        data
     end
 
     subgraph ios
         ios-app --> iOS-モジュール
         subgraph iOS-モジュール
-            fa(feature-a) --> KMPFramework
-            fb(feature-b)
-            fc(feature-c) --> KMPFramework
+            fa(feature) --> KMPFramework
         end
         kmp-umbrella
         KMPFramework
