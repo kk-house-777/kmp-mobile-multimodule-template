@@ -1,17 +1,17 @@
 # CLAUDE.md
 
 当資料は英語で記載しますが、特別事情がなければ出力は日本語にしてください。
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Overview
+# kmp-multimodule-template
+KMPを使ったiOS, Andoridのマルチモジュール構成のtemplateアプリを作成する。
+## 要件
+- iOSプロジェクトの管理はtuistが前提
 
-This is a Cookiecutter-based template repository for generating Kotlin Multiplatform (KMP) + Tuist mobile projects. The repository contains:
-- A reference implementation (`sample-project/`)
-- A Cookiecutter template (`cookiecutter-kmp-mobile-tuist/`)
-- A CLI wrapper script (`kmp-mobile-tuist`)
+## 前提
+- [mise](https://github.com/jdx/mise)
 
-## Development Setup
-
+## 使い方
+### クイックスタート
 ```bash
 # Install dependencies
 mise install
@@ -27,67 +27,7 @@ mise install
 mise run ios-gen
 ```
 
-## Architecture
-
-### Template Generation Flow
-
-1. **User Input** → Cookiecutter variables in `cookiecutter.json`
-2. **Validation** → `hooks/pre_gen_project.py` validates project_name and bundle_id_prefix
-3. **Template Rendering** → Jinja2 processes all files in `{{cookiecutter.project_name}}/`
-4. **Post-Processing** → `hooks/post_gen_project.py` moves Kotlin package directories from placeholder (`kk/tuist/app`) to user-specified package path
-
-### Key Template Variables
-
-- `project_name`: Used for rootProject.name and derives resource package name
-- `bundle_id_prefix`: Used for Android applicationId, iOS Bundle ID, and Kotlin package names
-- `android_app_name` / `ios_app_name`: App display names (default to project_name)
-
-**Important transformations:**
-- `project_name` → lowercase with hyphens/spaces replaced by underscores for resource packages
-  - Example: `"MyApp"` → `myapp.android_app.generated.resources`
-- `bundle_id_prefix` → Used as-is for package declarations
-  - Example: `"com.example.app"` → `package com.example.app`
-
-### Build Logic Architecture (Gradle Convention Plugins)
-
-The template uses Gradle Composite Build with convention plugins in `build-logic/`:
-
-**Key Concept: Dynamic Package Naming**
-- `NamespaceUtils.kt` provides `getDefaultPackageName(moduleName)`
-- Returns `"${bundle_id_prefix}.${moduleName.replace("-", "_")}"`
-- Used by primitive plugins to set `namespace` and Compose Resources `packageOfResClass`
-
-**Primitive Plugins** (in `build-logic/src/main/kotlin/primitive/`):
-- `kmp.gradle.kts`: Base KMP setup, sets Android namespace dynamically
-- `kmp.compose.gradle.kts`: Compose Multiplatform setup
-- `compose.resources.gradle.kts`: Configures Compose Resources with dynamic package naming
-- `kmp.ios.gradle.kts`: iOS framework configuration
-- `kmp.skie.gradle.kts`: SKIE (Swift-Kotlin Interface Enhancer)
-- `metro.gradle.kts`: Metro bundler for React Native (if applicable)
-
-**Convention Plugins** (in `build-logic/src/main/kotlin/convention/`):
-- Compose primitive plugins to provide higher-level configurations
-
-### Template File Modifications
-
-When modifying template files, remember:
-
-1. **Hard-coded values must be templated:**
-   - Package declarations: `package {{ cookiecutter.bundle_id_prefix }}`
-   - Import statements for generated resources use project name:
-     ```kotlin
-     import {{ cookiecutter.project_name|lower|replace('-', '_')|replace(' ', '_') }}.android_app.generated.resources.Res
-     ```
-   - iOS Bundle IDs: `{{ cookiecutter.bundle_id_prefix }}.{{ cookiecutter.ios_app_name }}`
-
-2. **Keep sample-project in sync:** Changes to template structure should be reflected in `sample-project/` as the reference implementation
-
-3. **Files that should NOT be rendered:** Listed in `_copy_without_render` (binary files, gradle wrapper)
-
-## Common Commands
-
-### Template Development
-
+### create project
 ```bash
 # Create test project (interactive)
 ./kmp-mobile-tuist create
@@ -99,67 +39,81 @@ When modifying template files, remember:
   --no-input
 ```
 
-### Testing Generated Projects
+# Development
 
-```bash
-# Build Android
-./gradlew android-app:build
+This is a Cookiecutter-based template repository for generating Kotlin Multiplatform (KMP) + Tuist mobile projects. The repository contains:
+- A reference implementation (`sample-project/`)
+- A Cookiecutter template (`cookiecutter-kmp-mobile-tuist/`)
+- A CLI wrapper script (`kmp-mobile-tuist`)
 
-# Generate iOS project with Tuist
-cd ios && tuist generate
+## 仕組み
+```
+% ./kmp-mobile-tuist --help
+kmp-mobile-tuist - CLI tool for creating KMP + Tuist mobile projects
 
-# Clean all builds
-./gradlew clean
+Usage:
+  kmp-mobile-tuist create [OPTIONS]
+
+Commands:
+  create              Create a new KMP + Tuist project from template
+  --help, -h          Show this help message
+
+Options for 'create':
+  --project-name NAME         Project name (default: App)
+  --bundle-id ID              Bundle ID prefix (default: com.example.app)
+  --android-app-name NAME     Android app name (default: same as project-name)
+  --ios-app-name NAME         iOS app name (default: same as project-name)
+  --output-dir DIR            Output directory (default: current directory)
+  --no-input                  Use default values without prompting
+
+Examples:
+  # Interactive mode
+  kmp-mobile-tuist create
+
+  # With arguments
+  kmp-mobile-tuist create --project-name MyApp --bundle-id com.mycompany.myapp
+
+  # Non-interactive mode
+  kmp-mobile-tuist create --project-name MyApp --bundle-id com.mycompany.myapp --no-input
 ```
 
-### Maintaining sample-project
+##  sample-projectの変更をcookiecutter-kmp-mobile-tuistに反映
 
-The `sample-project/` should remain buildable as a reference. When updating template:
-1. Test changes in `sample-project/` first
-2. Apply working changes to `cookiecutter-kmp-mobile-tuist/{{cookiecutter.project_name}}/`
-3. Add appropriate Jinja2 template syntax
+###  ./scripts/sync-sample-to-template.sh --help 
+```
+使用方法: sync-sample-to-template.sh [OPTIONS]
 
-## Critical Template Rules
+sample-projectの変更をCookiecutterテンプレートに同期します。
+Jinja2テンプレート変数を保護し、誤って上書きすることを防ぎます。
 
-### Project Name Validation (pre_gen_project.py)
-- Must start with a letter (a-z or A-Z)
-- Can contain letters, numbers, hyphens (-), and underscores (_)
-- Cannot start or end with hyphen/underscore
-- Valid: `MyApp`, `my-app`, `kk_app`
+オプション:
+  --dry-run          実際には変更せず、同期内容のみ表示
+  --commit HASH      変更検出のコミット範囲を指定 (デフォルト: HEAD~1..HEAD)
+  --working-tree     未コミットの変更(working tree)を同期対象にする
+  --verbose          詳細ログを出力
+  --help             このヘルプを表示
 
-### Bundle ID Validation
-- Reverse domain format (e.g., `com.example.app`)
-- Each segment starts with lowercase letter
-- Only lowercase letters, numbers, underscores allowed
+終了コード:
+  0  成功 (全ファイル同期完了 or dry-run)
+  1  一部失敗 (スキップを除く)
+  2  全失敗 or 設定エラー
 
-### Package Directory Migration (post_gen_project.py)
+例:
+  # 最新のコミットからの変更を同期
+  ./scripts/sync-sample-to-template.sh
 
-The hook automatically:
-1. Moves `kk/tuist/app` → `{bundle_id_prefix_as_path}`
-2. Cleans up empty parent directories hierarchically
-3. Processes all Kotlin source sets: commonMain, androidMain, iosMain, *Test
+  # ドライランモード
+  ./scripts/sync-sample-to-template.sh --dry-run
 
-## .gitignore Considerations
+  # 特定のコミット範囲を指定
+  ./scripts/sync-sample-to-template.sh --commit main..HEAD
 
-Template excludes build artifacts and generated files:
-- `.gradle/`, `build/`, `.kotlin/`
-- `local.properties`, `.idea/`
-- Xcode: `*.xcodeproj`, `*.xcworkspace`, `Derived/`
-- Tuist generates these, so they should never be committed in the template
+  # 未コミットの変更を同期
+  ./scripts/sync-sample-to-template.sh --working-tree
 
-## Troubleshooting
+  # 詳細ログ付きで実行
+  ./scripts/sync-sample-to-template.sh --verbose
+```
 
-### "Unresolved reference" for Compose Resources
-- Ensure import uses project name (lowercase, underscore-separated):
-  ```kotlin
-  import {{ cookiecutter.project_name|lower|replace('-', '_') }}.android_app.generated.resources.Res
-  ```
-- NOT the bundle_id_prefix
-
-### Empty kk/tuist/app directories remain after generation
-- Check `post_gen_project.py` cleanup logic
-- Verify the hierarchical directory removal works from deepest to shallowest
-
-### Template rendering errors with Jinja2 extensions
-- Avoid using external Jinja2 extensions (like `jinja2_time`)
-- Use only built-in filters: `lower`, `replace`, `upper`, etc.
+### github action
+`.github/sync-sample-to-template.yml`
