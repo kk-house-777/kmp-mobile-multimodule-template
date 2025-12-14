@@ -1,70 +1,64 @@
-# Sample Project - KMP + Tuist マルチプラットフォームアプリ
+# Sample Project - KMP + Tuist Multiplatform App
 
-このプロジェクトは、Kotlin Multiplatform (KMP) と Tuist を使用したiOS/Androidマルチプラットフォームアプリのリファレンス実装です。
+> [日本語版はこちら / Japanese version](./doc/README.ja.md)
 
-## 前提条件
+This project is a reference implementation of an iOS/Android multiplatform application using Kotlin Multiplatform (KMP) and Tuist.
 
-- [mise](https://github.com/jdx/mise) - 各種開発ツールのバージョン管理に使用
+## Prerequisites
 
-## セットアップ
+- [mise](https://github.com/jdx/mise) - Used for managing development tool versions
 
-### 1. 依存関係のインストール
+## Setup
+
+### 1. Install Dependencies
 
 ```bash
-# miseで必要なツールをインストール
+# Install required tools with mise
 mise install
 ```
 
-### 2. Androidアプリのビルド
+### 2. Build Android App
 
 ```bash
-# Gradleを使用してAndroidアプリをビルド
+# Build Android app using Gradle
 ./gradlew android-app:build
 ```
 
-### 3. iOSプロジェクトの生成
+### 3. Generate iOS Project
 
 ```bash
-# Tuistでプロジェクトを生成
+# Generate project with Tuist
 mise run ios-gen
 ```
 
-## プロジェクト構成
+## Project Structure
 
 ```
 sample-project/
-├── android-app/          # Androidアプリケーション
-├── ios/                  # iOSプロジェクト (Tuist管理)
-│   ├── ios-app/         # メインiOSアプリ
-│   ├── Feature/         # iOS専用機能モジュール
-│   ├── KMPFramework/    # KMPコードのラッパーフレームワーク
-│   └── kmp-umbrella/    # KMPライブラリの公開インターフェース
-├── kmp-libraries/        # 共有KMPライブラリ
-│   └── feature/         # ビジネスロジックとUI
+├── android-app/          # Android application
+├── ios/                  # iOS project (managed by Tuist)
+│   ├── ios-app/         # Main iOS app
+│   ├── Feature/         # iOS-specific feature modules
+│   ├── KMPFramework/    # Wrapper framework for KMP code
+│   └── kmp-umbrella/    # Public interface for KMP libraries
+├── kmp-libraries/        # Shared KMP libraries
+│   └── feature/         # Common feature modules
 └── build-logic/          # Gradle Convention Plugins
 ```
-
-## アーキテクチャ
-
-### モジュール構成
 
 ```mermaid
 flowchart TD
     android-app
 
     subgraph kmp-libraries
-        feature-a
-        feature-b
-        data-a
-        data-b
+        feature
+        data
     end
 
     subgraph ios
-        ios-app --> iOS-モジュール
-        subgraph iOS-モジュール
-            fa(feature-a) --> KMPFramework
-            fb(feature-b)
-            fc(feature-c) --> KMPFramework
+        ios-app --> iOS-modules
+        subgraph iOS-modules
+            fa(feature) --> KMPFramework
         end
         kmp-umbrella
         KMPFramework
@@ -75,34 +69,33 @@ flowchart TD
     KMPFramework -->|import| kmp-umbrella
 ```
 
-## 開発コマンド
+## Development Commands
 
-### iOS開発
+### iOS Development
 
 ```bash
-# プロジェクト生成
+# Generate project
 mise run ios-gen
 
-# Tuistマニフェスト編集
+# Edit Tuist manifests
 mise run ios-edit
 
-# プロジェクトクリーン
+# Clean project
 mise run ios-clean
 ```
 
-### Android開発
+### Android Development
 
 ```bash
-# ビルド
+# Build
 ./gradlew android-app:build
 
-# インストール
+# Install
 ./gradlew android-app:installDebug
 
-# テスト実行
+# Run tests
 ./gradlew test
 ```
 
 ## Convention Plugins
-
-`build-logic/` には再利用可能なビルド設定を提供するカスタムConvention Pluginsがあります
+The `build-logic/` directory contains custom Convention Plugins that provide reusable build configurations.
