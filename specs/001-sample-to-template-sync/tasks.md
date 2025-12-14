@@ -1,206 +1,565 @@
-# Tasks: Sample Project to Template Synchronization
+# Implementation Tasks: Sample Project to Template Synchronization
 
-**Input**: Design documents from `/specs/001-sample-to-template-sync/`
-**Prerequisites**: plan.md (required), spec.md (required for user stories)
+**Feature**: #001-sample-to-template-sync
+**Created**: 2025-12-07
+**Dependencies**: [spec.md](./spec.md), [plan.md](./plan.md)
 
-**Tests**: テストはオプションであり、spec.mdでの明示的な要求がない限り含まれません。
+## Task Organization
 
-**Organization**: タスクはユーザーストーリー別に整理され、各ストーリーの独立した実装とテストを可能にします。
-
-## Format: `[ID] [P?] [Story] Description`
-
-- **[P]**: 並列実行可能（異なるファイル、依存関係なし）
-- **[Story]**: このタスクが属するユーザーストーリー（例: US1, US2, US3）
-- 説明には正確なファイルパスを含む
-
-## Path Conventions
-
-このプロジェクトは以下の構造を使用します:
-- **スクリプト**: `scripts/` (リポジトリルート)
-- **GitHub Actions**: `.github/workflows/`
-- **テスト**: `tests/sync-sample-to-template/`
-- **ドキュメント**: `specs/001-sample-to-template-sync/`
+Tasks are organized by phase and user story priority. Tasks marked with `[P]` can be executed in parallel with other `[P]` tasks in the same phase.
 
 ---
 
-## Phase 1: Setup (共通インフラ)
+## Phase 1: Setup & Foundation
 
-**目的**: プロジェクト初期化と基本構造
+### TASK-001: [P] Project structure initialization
+**Story**: Setup | **Priority**: P0 | **Estimated Effort**: 15min
+**Files**: `scripts/`, `tests/sync-sample-to-template/`
 
-- [ ] T001 スクリプトディレクトリを作成 `scripts/`
-- [ ] T002 テストディレクトリを作成 `tests/sync-sample-to-template/`
-- [ ] T003 [P] bats-coreのセットアップ方法をREADMEに追記（オプション）
+Create the base directory structure for the synchronization system.
 
----
-
-## Phase 2: Foundational (全ストーリーの前提条件)
-
-**目的**: 全てのユーザーストーリーが依存するコアインフラ
-
-**⚠️ 重要**: このフェーズが完了するまで、ユーザーストーリーの作業を開始できません
-
-- [ ] T004 パスマッピング機能の実装 in `scripts/sync-sample-to-template.sh`
-- [ ] T005 [P] Jinja2変数検出機能の実装 in `scripts/sync-sample-to-template.sh`
-- [ ] T006 基本的なCLI引数パース（--help）の実装 in `scripts/sync-sample-to-template.sh`
-
-**Checkpoint**: 基盤完成 - ユーザーストーリーの実装を並列で開始可能
+**Acceptance Criteria**:
+- [ ] `scripts/` directory exists
+- [ ] `tests/sync-sample-to-template/` directory exists
+- [ ] Directories are committed to git
 
 ---
 
-## Phase 3: User Story 1 - 手動での変更反映 (Priority: P1) 🎯 MVP
+### TASK-002: Path mapping logic
+**Story**: US1 | **Priority**: P1 | **Estimated Effort**: 30min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-001
 
-**Goal**: 開発者がsample-projectに変更を加えた後、その変更をtemplateに手動で反映させる。Jinja2変数は保護される。
+Implement the path mapping function that converts sample-project paths to template paths.
 
-**Independent Test**: sample-projectの任意のファイル（例：build.gradleの依存関係）を変更し、同期コマンドを実行することで、templateの対応するファイルが更新され、Jinja2変数が保持されていることを確認できる。
-
-### Implementation for User Story 1
-
-- [ ] T007 [P] [US1] Git diff解析機能の実装（変更ファイル検出） in `scripts/sync-sample-to-template.sh`
-- [ ] T008 [US1] ファイル同期ロジックの実装（追加・変更・削除対応） in `scripts/sync-sample-to-template.sh`
-- [ ] T009 [US1] Jinja2変数保護機能の統合 in `scripts/sync-sample-to-template.sh`
-- [ ] T010 [US1] 同期レポート生成機能の実装（標準出力） in `scripts/sync-sample-to-template.sh`
-- [ ] T011 [US1] スクリプトに実行権限を付与し、基本動作確認
-
-**Checkpoint**: この時点でUser Story 1は完全に機能し、独立してテスト可能です
-
----
-
-## Phase 4: User Story 2 - 変更の検証と安全性確保 (Priority: P2)
-
-**Goal**: 開発者が同期を実行する際、templateの置換部分に影響を与える変更がある場合は警告を受け、同期をスキップできる。
-
-**Independent Test**: Jinja2変数を含むファイルをsample-projectで変更し、同期を実行すると警告が表示され、そのファイルがスキップされることを確認できる。
-
-### Implementation for User Story 2
-
-- [ ] T012 [P] [US2] ドライランモード（--dry-run）の実装 in `scripts/sync-sample-to-template.sh`
-- [ ] T013 [P] [US2] 詳細ログモード（--verbose）の実装 in `scripts/sync-sample-to-template.sh`
-- [ ] T014 [US2] スキップファイルの詳細レポート機能の実装 in `scripts/sync-sample-to-template.sh`
-- [ ] T015 [US2] エラーハンドリングと適切な終了コードの実装 in `scripts/sync-sample-to-template.sh`
-
-**Checkpoint**: User Stories 1と2の両方が独立して動作することを確認
-
----
-
-## Phase 5: User Story 3 - GitHub Actions による自動同期 (Priority: P3)
-
-**Goal**: mainブランチへのpushまたはマージ時に、sample-projectの変更が自動的にtemplateに反映される。
-
-**Independent Test**: sample-projectの変更を含むPRをmainにマージし、GitHub Actionsワークフローが起動して、自動的にtemplateが更新され、コミットが作成されることを確認できる。
-
-### Implementation for User Story 3
-
-- [ ] T016 [P] [US3] GitHub Actionsワークフローファイルの作成 `.github/workflows/sync-template.yml`
-- [ ] T017 [US3] ワークフロートリガー設定（mainブランチ、sample-project/**パス） in `.github/workflows/sync-template.yml`
-- [ ] T018 [US3] 同期スクリプト実行ステップの追加 in `.github/workflows/sync-template.yml`
-- [ ] T019 [US3] 自動コミット・プッシュロジックの追加 in `.github/workflows/sync-template.yml`
-- [ ] T020 [US3] 失敗時の通知設定（GitHub Actions標準） in `.github/workflows/sync-template.yml`
-
-**Checkpoint**: 全てのユーザーストーリーが独立して機能することを確認
-
----
-
-## Phase 6: Polish & Cross-Cutting Concerns
-
-**目的**: 複数のユーザーストーリーに影響する改善
-
-- [ ] T021 [P] クイックスタートガイドの作成 `specs/001-sample-to-template-sync/quickstart.md`
-- [ ] T022 [P] エッジケースのドキュメント化（バイナリファイル、シンボリックリンクなど） in `quickstart.md`
-- [ ] T023 実際のsample-project変更でのE2Eテスト実施
-- [ ] T024 [P] bats-coreテストの作成（オプション） in `tests/sync-sample-to-template/test_sync.bats`
-- [ ] T025 コードクリーンアップとコメント追加 in `scripts/sync-sample-to-template.sh`
-
----
-
-## Dependencies & Execution Order
-
-### Phase Dependencies
-
-- **Setup (Phase 1)**: 依存関係なし - 即座に開始可能
-- **Foundational (Phase 2)**: Setupの完了に依存 - 全てのユーザーストーリーをブロック
-- **User Stories (Phase 3+)**: 全てFoundational phaseの完了に依存
-  - ユーザーストーリーは並列で進行可能（リソースがある場合）
-  - または優先順位順に順次実行（P1 → P2 → P3）
-- **Polish (Final Phase)**: 全ての希望するユーザーストーリーの完了に依存
-
-### User Story Dependencies
-
-- **User Story 1 (P1)**: Foundational (Phase 2)の後に開始可能 - 他のストーリーに依存なし
-- **User Story 2 (P2)**: Foundational (Phase 2)の後に開始可能 - US1と統合するがUS1に依存する（US1の機能を拡張）
-- **User Story 3 (P3)**: Foundational (Phase 2)の後に開始可能 - US1とUS2に依存する（既存の同期機能を自動化）
-
-### Within Each User Story
-
-- コア実装が統合前に完了
-- ストーリー完了後、次の優先順位に移動
-
-### Parallel Opportunities
-
-- 全てのSetupタスクは並列実行可能
-- Foundationalフェーズ内で[P]マークのタスクは並列実行可能
-- User Story 1とUser Story 2の一部実装は並列可能（異なるファイル）
-- Polishフェーズの[P]マークタスクは並列実行可能
-
----
-
-## Parallel Example: User Story 1
-
+**Implementation Details**:
 ```bash
-# User Story 1内の並列可能なタスクをまとめて実行:
-Task: "Git diff解析機能の実装（変更ファイル検出）"  # T007 [P] - 異なる関数
-# 注: US1のタスクは相互依存が高いため、並列化の機会は限定的
+map_path() {
+    local src_path="$1"
+    # sample-project/foo/bar.kt → cookiecutter-kmp-mobile-tuist/{{cookiecutter.project_name}}/foo/bar.kt
+    echo "${src_path/sample-project/cookiecutter-kmp-mobile-tuist\/{{cookiecutter.project_name\}\}}"
+}
 ```
 
----
-
-## Implementation Strategy
-
-### MVP First (User Story 1のみ)
-
-1. Phase 1: Setupを完了
-2. Phase 2: Foundationalを完了（重要 - 全ストーリーをブロック）
-3. Phase 3: User Story 1を完了
-4. **停止して検証**: User Story 1を独立してテスト
-5. 準備ができたらデプロイ/デモ
-
-### Incremental Delivery
-
-1. Setup + Foundationalを完了 → 基盤完成
-2. User Story 1を追加 → 独立テスト → デプロイ/デモ (MVP!)
-3. User Story 2を追加 → 独立テスト → デプロイ/デモ
-4. User Story 3を追加 → 独立テスト → デプロイ/デモ
-5. 各ストーリーは前のストーリーを壊さずに価値を追加
-
-### Parallel Team Strategy
-
-複数の開発者がいる場合:
-
-1. チーム全体でSetup + Foundationalを完了
-2. Foundational完了後:
-   - 開発者A: User Story 1（T007-T011）
-   - 開発者B: User Story 2の一部準備（T012-T013の設計）
-3. User Story 1完了後:
-   - 開発者A: User Story 3（T016-T020）
-   - 開発者B: User Story 2（T012-T015）
+**Acceptance Criteria**:
+- [ ] Function correctly maps sample-project root to template root
+- [ ] Preserves subdirectory structure
+- [ ] Handles edge cases (paths with spaces, special characters)
 
 ---
 
-## Task Summary
+### TASK-003: Jinja2 variable detection
+**Story**: US1, US2 | **Priority**: P1 | **Estimated Effort**: 30min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-001
 
-- **合計タスク数**: 25タスク
-- **User Story 1タスク数**: 5タスク（T007-T011）
-- **User Story 2タスク数**: 4タスク（T012-T015）
-- **User Story 3タスク数**: 5タスク（T016-T020）
-- **並列実行機会**: SetupとFoundationalフェーズで最大3タスク、Polishフェーズで最大3タスク
-- **推奨MVPスコープ**: Phase 1 + Phase 2 + Phase 3（User Story 1のみ）
+Implement detection of Jinja2 template variables in files.
+
+**Implementation Details**:
+```bash
+has_jinja2_vars() {
+    local file="$1"
+    grep -qE '\{\{|\{%|\{#' "$file" 2>/dev/null
+}
+```
+
+**Acceptance Criteria**:
+- [ ] Detects `{{ cookiecutter.* }}` patterns
+- [ ] Detects `{% ... %}` patterns
+- [ ] Detects `{# ... #}` comment patterns
+- [ ] Returns false for binary files
+- [ ] Returns false for files without Jinja2 syntax
 
 ---
 
-## Notes
+## Phase 2: Core Synchronization (US1 - P1)
 
-- [P]タスク = 異なるファイル、依存関係なし
-- [Story]ラベルはタスクを特定のユーザーストーリーにマッピング（トレーサビリティのため）
-- 各ユーザーストーリーは独立して完了・テスト可能
-- 各タスクまたは論理的なグループの後にコミット
-- 任意のチェックポイントで停止してストーリーを独立して検証
-- 避けるべき: 曖昧なタスク、同じファイルの競合、独立性を壊すストーリー間依存
+### TASK-004: Git diff analysis
+**Story**: US1 | **Priority**: P1 | **Estimated Effort**: 45min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-001
+
+Implement Git-based change detection for sample-project files.
+
+**Implementation Details**:
+- Use `git diff --name-status` to detect added/modified/deleted files
+- Filter for files under `sample-project/` directory
+- Support `--commit` option to specify commit range
+
+**Acceptance Criteria**:
+- [ ] Detects added files (status: A)
+- [ ] Detects modified files (status: M)
+- [ ] Detects deleted files (status: D)
+- [ ] Filters to `sample-project/**` only
+- [ ] Supports custom commit range via `--commit` option
+
+---
+
+### TASK-005: File synchronization logic
+**Story**: US1 | **Priority**: P1 | **Estimated Effort**: 1h
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-002, TASK-003, TASK-004
+
+Implement the core file synchronization logic with Jinja2 protection.
+
+**Implementation Details**:
+```bash
+sync_file() {
+    local src="$1"
+    local change_type="$2"
+    local dst=$(map_path "$src")
+
+    # Check if destination has Jinja2 vars
+    if [[ -f "$dst" ]] && has_jinja2_vars "$dst"; then
+        echo "⊘ SKIP: $src (destination contains Jinja2 variables)"
+        return 1
+    fi
+
+    case "$change_type" in
+        A|M) cp -f "$src" "$dst" ;;
+        D) rm -f "$dst" ;;
+    esac
+}
+```
+
+**Acceptance Criteria**:
+- [ ] Copies added files (A) to template
+- [ ] Copies modified files (M) to template
+- [ ] Deletes removed files (D) from template
+- [ ] Skips files where destination contains Jinja2 variables
+- [ ] Creates parent directories as needed
+- [ ] Preserves binary files correctly
+
+---
+
+### TASK-006: Sync report generation
+**Story**: US1 | **Priority**: P1 | **Estimated Effort**: 30min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-005
+
+Generate a summary report of synchronization results.
+
+**Output Format**:
+```
+[sync-template] Summary:
+  Total:    12 files
+  Success:  10 files
+  Skipped:  2 files (Jinja2 variables detected)
+  Failed:   0 files
+```
+
+**Acceptance Criteria**:
+- [ ] Counts total changed files
+- [ ] Counts successfully synced files
+- [ ] Counts skipped files with reasons
+- [ ] Counts failed files with error messages
+- [ ] Outputs human-readable summary
+
+---
+
+### TASK-007: CLI argument parsing
+**Story**: US1 | **Priority**: P1 | **Estimated Effort**: 30min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-001
+
+Implement CLI argument parsing for script options.
+
+**Supported Options**:
+- `--dry-run`: Show what would be synced without making changes
+- `--commit HASH`: Specify commit range for change detection
+- `--verbose`: Enable detailed logging
+- `--help`: Display usage information
+
+**Acceptance Criteria**:
+- [ ] Parses all supported options correctly
+- [ ] Displays help text with `--help`
+- [ ] Validates option values
+- [ ] Sets appropriate flags for each option
+
+---
+
+### TASK-008: Script header and error handling
+**Story**: US1 | **Priority**: P1 | **Estimated Effort**: 20min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-001
+
+Add robust error handling and script setup.
+
+**Implementation**:
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Trap errors
+trap 'echo "[ERROR] Script failed at line $LINENO"' ERR
+```
+
+**Acceptance Criteria**:
+- [ ] Script has proper shebang
+- [ ] Enables strict mode (`set -euo pipefail`)
+- [ ] Traps and reports errors with line numbers
+- [ ] Exits with appropriate exit codes (0=success, 1=partial failure, 2=error)
+
+---
+
+## Phase 3: Validation & Safety (US2 - P2)
+
+### TASK-009: Dry-run mode implementation
+**Story**: US2 | **Priority**: P2 | **Estimated Effort**: 30min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-007, TASK-005
+
+Implement dry-run mode that shows changes without applying them.
+
+**Output Example**:
+```
+[sync-template] DRY RUN MODE - No files will be modified
+[sync-template] Would sync:
+  ✓ android-app/build.gradle.kts
+[sync-template] Would skip:
+  ⊘ settings.gradle.kts (contains Jinja2 variables)
+```
+
+**Acceptance Criteria**:
+- [ ] `--dry-run` flag prevents all file modifications
+- [ ] Shows list of files that would be synced
+- [ ] Shows list of files that would be skipped with reasons
+- [ ] Exit code reflects what would happen (0=success, 1=would have failures)
+
+---
+
+### TASK-010: Verbose logging
+**Story**: US2 | **Priority**: P2 | **Estimated Effort**: 20min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-007
+
+Add detailed logging when `--verbose` flag is used.
+
+**Acceptance Criteria**:
+- [ ] Logs each file being processed
+- [ ] Logs path mapping results
+- [ ] Logs Jinja2 detection results
+- [ ] Logs file operation success/failure
+- [ ] Only enabled when `--verbose` is set
+
+---
+
+### TASK-011: Detailed skip reporting
+**Story**: US2 | **Priority**: P2 | **Estimated Effort**: 30min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-006
+
+Enhance skip reporting with detailed reasons and affected lines.
+
+**Example Output**:
+```
+⊘ SKIP: sample-project/settings.gradle.kts
+  Reason: Contains Jinja2 variables
+  Lines: 5, 12, 23 ({{ cookiecutter.project_name }})
+```
+
+**Acceptance Criteria**:
+- [ ] Shows file path being skipped
+- [ ] Shows reason for skip
+- [ ] Optionally shows line numbers with Jinja2 patterns (in verbose mode)
+
+---
+
+## Phase 4: GitHub Actions Integration (US3 - P3)
+
+### TASK-012: [P] GitHub Actions workflow file
+**Story**: US3 | **Priority**: P3 | **Estimated Effort**: 45min
+**Files**: `.github/workflows/sync-template.yml`
+**Dependencies**: TASK-008 (script must be functional)
+
+Create GitHub Actions workflow for automatic synchronization.
+
+**Workflow Specification**:
+```yaml
+name: Sync Sample to Template
+on:
+  push:
+    branches: [main]
+    paths: ['sample-project/**']
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/sync-sample-to-template.sh
+      - run: git add .
+      - run: git commit -m "chore: sync sample-project changes to template"
+      - run: git push
+```
+
+**Acceptance Criteria**:
+- [ ] Triggers on push to main branch
+- [ ] Only runs when `sample-project/**` files change
+- [ ] Checks out repository
+- [ ] Runs sync script
+- [ ] Commits changes if any
+- [ ] Pushes to main branch
+
+---
+
+### TASK-013: Auto-commit logic
+**Story**: US3 | **Priority**: P3 | **Estimated Effort**: 30min
+**Files**: `.github/workflows/sync-template.yml`
+**Dependencies**: TASK-012
+
+Implement automatic commit and push of synchronized changes.
+
+**Implementation**:
+- Configure git user for automated commits
+- Check if there are changes to commit (`git diff --quiet`)
+- Create commit with descriptive message
+- Push to main branch using `GITHUB_TOKEN`
+
+**Acceptance Criteria**:
+- [ ] Configures git user.name and user.email
+- [ ] Only commits when changes exist
+- [ ] Commit message includes sync context
+- [ ] Uses `GITHUB_TOKEN` for authentication
+- [ ] Handles push failures gracefully
+
+---
+
+### TASK-014: Workflow failure notifications
+**Story**: US3 | **Priority**: P3 | **Estimated Effort**: 20min
+**Files**: `.github/workflows/sync-template.yml`
+**Dependencies**: TASK-012
+
+Configure failure notifications for the workflow.
+
+**Acceptance Criteria**:
+- [ ] Workflow fails if sync script exits with error
+- [ ] Failure triggers GitHub's default notification
+- [ ] Workflow summary shows failure reason
+- [ ] Failed runs are easily identifiable in Actions tab
+
+---
+
+## Phase 5: Testing & Documentation
+
+### TASK-015: [P] Basic sync test (bats)
+**Story**: Testing | **Priority**: P1 | **Estimated Effort**: 1h
+**Files**: `tests/sync-sample-to-template/test_sync.bats`
+**Dependencies**: TASK-008
+
+Create bats tests for core synchronization functionality.
+
+**Test Cases**:
+- File addition sync
+- File modification sync
+- File deletion sync
+- Jinja2 variable detection
+- Path mapping
+- Dry-run mode
+
+**Acceptance Criteria**:
+- [ ] Tests run with `bats tests/sync-sample-to-template/test_sync.bats`
+- [ ] All test cases pass
+- [ ] Tests are reproducible and isolated
+
+---
+
+### TASK-016: [P] Template generation validation test
+**Story**: Testing | **Priority**: P2 | **Estimated Effort**: 45min
+**Files**: `tests/sync-sample-to-template/test_template_generation.sh`
+**Dependencies**: TASK-008
+
+Create end-to-end test that validates template can still be generated.
+
+**Test Flow**:
+1. Run sync script
+2. Generate a test project from template using cookiecutter
+3. Verify generated project builds successfully
+
+**Acceptance Criteria**:
+- [ ] Test generates project from template
+- [ ] Verifies no Jinja2 syntax errors
+- [ ] Can be run manually for validation
+- [ ] Exits with non-zero on failure
+
+---
+
+### TASK-017: [P] Quickstart documentation
+**Story**: Documentation | **Priority**: P2 | **Estimated Effort**: 30min
+**Files**: `specs/001-sample-to-template-sync/quickstart.md`
+**Dependencies**: TASK-008
+
+Write user-facing documentation for the sync tool.
+
+**Content**:
+- Installation (if any)
+- Basic usage examples
+- Option descriptions
+- Common workflows
+- Troubleshooting
+
+**Acceptance Criteria**:
+- [ ] Document covers all CLI options
+- [ ] Includes practical examples
+- [ ] Explains Jinja2 protection behavior
+- [ ] Written in Japanese (per CLAUDE.md)
+
+---
+
+### TASK-018: [P] Update main README
+**Story**: Documentation | **Priority**: P3 | **Estimated Effort**: 15min
+**Files**: `README.md` (if exists at repository root)
+**Dependencies**: TASK-017
+
+Add a section to the main README about the sync tool.
+
+**Acceptance Criteria**:
+- [ ] Mentions sync tool existence
+- [ ] Links to quickstart documentation
+- [ ] Briefly explains its purpose
+
+---
+
+## Phase 6: Edge Cases & Polish
+
+### TASK-019: Binary file handling
+**Story**: Edge Cases | **Priority**: P2 | **Estimated Effort**: 30min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-005
+
+Ensure binary files (images, JARs) are handled correctly.
+
+**Implementation**:
+- Use `cp` which is binary-safe
+- Skip Jinja2 detection for binary files (grep will fail gracefully)
+
+**Acceptance Criteria**:
+- [ ] Binary files are copied correctly
+- [ ] No corruption occurs
+- [ ] Jinja2 detection doesn't error on binary files
+
+---
+
+### TASK-020: Symbolic link handling
+**Story**: Edge Cases | **Priority**: P3 | **Estimated Effort**: 20min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-005
+
+Handle symbolic links appropriately.
+
+**Decision**: Document that symlinks are dereferenced (copied as files) or preserved.
+
+**Acceptance Criteria**:
+- [ ] Behavior with symlinks is documented
+- [ ] No errors when encountering symlinks
+
+---
+
+### TASK-021: File permission preservation
+**Story**: Edge Cases | **Priority**: P3 | **Estimated Effort**: 15min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-005
+
+Preserve executable permissions when syncing files.
+
+**Implementation**:
+- Use `cp -p` to preserve permissions
+
+**Acceptance Criteria**:
+- [ ] Executable files remain executable after sync
+- [ ] Permissions are preserved
+
+---
+
+### TASK-022: .gitignore and excluded files
+**Story**: Edge Cases | **Priority**: P2 | **Estimated Effort**: 30min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-004
+
+Respect .gitignore patterns and exclude certain files from sync.
+
+**Excluded Patterns**:
+- `build/`, `.gradle/`, `.idea/`
+- `*.iml`, `local.properties`
+- Generated Xcode projects
+
+**Acceptance Criteria**:
+- [ ] Build artifacts are not synced
+- [ ] IDE-specific files are not synced
+- [ ] Only source files are synchronized
+
+---
+
+### TASK-023: Performance optimization
+**Story**: Performance | **Priority**: P3 | **Estimated Effort**: 30min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-008
+
+Optimize for performance with large file sets.
+
+**Optimizations**:
+- Batch file operations where possible
+- Avoid redundant checks
+- Use efficient git commands
+
+**Acceptance Criteria**:
+- [ ] Sync completes in under 1 minute for typical changes
+- [ ] Scales to 500 files (meets SC-003)
+
+---
+
+### TASK-024: Error recovery
+**Story**: Robustness | **Priority**: P2 | **Estimated Effort**: 30min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: TASK-008
+
+Handle partial failures gracefully.
+
+**Implementation**:
+- Continue syncing other files even if one fails
+- Report all failures at the end
+- Exit with appropriate code (1 for partial failure)
+
+**Acceptance Criteria**:
+- [ ] Script continues after individual file failure
+- [ ] All failures are reported in summary
+- [ ] Exit code reflects partial vs complete failure
+
+---
+
+### TASK-025: Code cleanup and comments
+**Story**: Code Quality | **Priority**: P3 | **Estimated Effort**: 30min
+**Files**: `scripts/sync-sample-to-template.sh`
+**Dependencies**: All implementation tasks
+
+Add comprehensive comments and clean up code.
+
+**Acceptance Criteria**:
+- [ ] All functions have comment headers
+- [ ] Complex logic has inline comments
+- [ ] Script follows consistent style
+- [ ] No redundant or dead code
+
+---
+
+## Summary
+
+**Total Tasks**: 25
+**Phases**: 6
+**Estimated Total Effort**: ~12-15 hours
+
+**Critical Path** (MVP):
+1. TASK-001 (Setup)
+2. TASK-002, TASK-003 (Path mapping, Jinja2 detection) - Can be parallel
+3. TASK-004 (Git diff)
+4. TASK-005 (Sync logic)
+5. TASK-006, TASK-007, TASK-008 (Reporting, CLI, Error handling) - Can be parallel
+6. TASK-015 (Testing)
+
+**Priority Execution Order**:
+- Phase 1 (Setup) → Phase 2 (US1-P1) → Phase 3 (US2-P2) → Phase 4 (US3-P3)
+- Testing and documentation can be done in parallel with implementation
+
+**Parallel Execution Groups**:
+- TASK-001, TASK-015, TASK-016, TASK-017, TASK-018 (different concerns, no shared files)
+- TASK-002, TASK-003 (different functions in same file, but independent logic)
+- TASK-006, TASK-007 (different parts of same script)

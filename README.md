@@ -129,3 +129,45 @@ mise run ios-gen
 - `cookiecutter-kmp-mobile-tuist/hooks/pre_gen_project.py`: 生成前のバリデーション
 - `cookiecutter-kmp-mobile-tuist/hooks/post_gen_project.py`: 生成後の処理
 - `cookiecutter-kmp-mobile-tuist/{{cookiecutter.project_name}}/`: テンプレートファイル本体
+
+## Sample Project から Template への同期
+
+`sample-project/`への変更を`cookiecutter-kmp-mobile-tuist/{{cookiecutter.project_name}}/`に自動的に反映するツールが用意されています。
+
+### 手動同期
+
+```bash
+# 最新の変更を同期
+./scripts/sync-sample-to-template.sh
+
+# ドライランモード(確認のみ)
+./scripts/sync-sample-to-template.sh --dry-run
+
+# 詳細ログ付き
+./scripts/sync-sample-to-template.sh --verbose
+```
+
+### 自動同期
+
+`main`ブランチへの`sample-project/**`の変更がpushされると、GitHub Actionsが自動的に同期を実行します。
+
+**重要**: このツールはJinja2テンプレート変数(`{{ cookiecutter.* }}`)を自動的に保護し、誤って上書きすることを防ぎます。
+
+### 行単位の保護（マーカー機能）
+
+ファイル全体ではなく、特定の行やセクションだけを保護したい場合は、以下のマーカーを使用できます：
+
+```kotlin
+// インラインマーカー（1行保護）
+package {{ cookiecutter.bundle_id_prefix }} // COOKIECUTTER_KEEP
+
+// セクションマーカー（複数行保護）
+// COOKIECUTTER_PROTECTED_START
+package {{ cookiecutter.bundle_id_prefix }}
+import {{ cookiecutter.project_name|lower }}.generated.resources.Res
+// COOKIECUTTER_PROTECTED_END
+```
+
+マーカーを使用すると、保護された行はそのまま保持され、それ以外の行はsample-projectから同期されます。
+
+詳細は[クイックスタートガイド](./specs/001-sample-to-template-sync/quickstart.md)を参照してください。
