@@ -1,173 +1,115 @@
-# kmp-mobile-tuist-template
+# kmp-multimodule-template
+KMPを使ったiOS, Andoridのマルチモジュール構成のtemplateアプリを作成する。
+## 要件
+- iOSプロジェクトの管理はtuistが前提
 
-iOSとAndroidのプロジェクト構成に対して、CompositeBuildを設定し、iOSのプロジェクト管理をTuistに移行後miseから実行できる様にしたtemplateのprojectです。
-
-- `./sample-project/`: サンプルプロジェクト
-- `./cookiecutter-kmp-mobile-tuist/`: Cookiecutterテンプレート
-- `./kmp-mobile-tuist`: CLIスクリプト
-
-## プロジェクト構成
-
-```
-.
-├── sample-project/              # サンプルプロジェクト
-├── cookiecutter-kmp-mobile-tuist/  # Cookiecutterテンプレート
-│   ├── cookiecutter.json        # テンプレート変数定義
-│   ├── hooks/                   # 生成時のフック処理
-│   │   ├── pre_gen_project.py   # バリデーション
-│   │   └── post_gen_project.py  # ディレクトリ移動処理
-│   └── {{cookiecutter.project_name}}/  # テンプレート本体
-└── kmp-mobile-tuist             # CLIスクリプト
-```
+## 前提
+- [mise](https://github.com/jdx/mise)
 
 ## 使い方
-
-### 1. 前提条件
-
-#### オプション A: mise を使う（推奨）
-
-このプロジェクトではmiseでPython環境とcookiecutterのバージョンを管理しています：
-
+### クイックスタート
 ```bash
-# miseをインストール（まだの場合）
-curl https://mise.run | sh
-
-# Python環境とcookiecutterをインストール
+# Install dependencies
 mise install
 mise run install
-```
 
-#### オプション B: pipx を使う
-
-```bash
-pipx install cookiecutter
-```
-
-### 2. 新しいプロジェクトを作成
-
-#### 対話形式で作成
-
-```bash
-# miseを使っている場合
+# Create a test project from template
 mise run create
 
-# または直接実行
-./kmp-mobile-tuist create
-```
-
-以下の情報を入力してください：
-- **project_name**: プロジェクト名 (例: `MyApp`)
-- **android_app_name**: Androidアプリ名 (デフォルト: project_nameと同じ)
-- **ios_app_name**: iOSアプリ名 (デフォルト: project_nameと同じ)
-- **bundle_id_prefix**: Bundle ID / Application ID のプレフィクス (例: `com.mycompany.myapp`)
-
-#### 引数を指定して作成
-
-```bash
-./kmp-mobile-tuist create \
-  --project-name MyApp \
-  --bundle-id com.mycompany.myapp
-```
-
-#### ノンインタラクティブモード
-
-```bash
-./kmp-mobile-tuist create \
-  --project-name MyApp \
-  --bundle-id com.mycompany.myapp \
-  --no-input
-```
-
-### 3. 生成されたプロジェクトのセットアップ
-
-```bash
-# プロジェクトディレクトリに移動
-cd MyApp
-
-# Tuistなどのツールをインストール
+# Test the generated project
+cd <generated-project-name>
 mise install
-
-# Androidアプリをビルド
 ./gradlew android-app:build
-
-# iOSプロジェクトを生成
 mise run ios-gen
 ```
 
-## テンプレート変数
-
-生成時に以下の変数が置換されます：
-
-| 変数 | 置換される箇所 | 例 |
-|------|---------------|-----|
-| `project_name` | rootProject.name, app_name | `MyApp` |
-| `bundle_id_prefix` | パッケージ名、applicationId、Bundle ID | `com.mycompany.myapp` |
-| `android_app_name` | Androidアプリ名 | `MyApp` |
-| `ios_app_name` | iOSアプリ名、PRODUCT_NAME | `MyApp` |
-
-### 主な置換箇所
-
-- **settings.gradle.kts**: `rootProject.name = "{{ project_name }}"`
-- **android-app/build.gradle.kts**: `namespace`, `applicationId`
-- **build-logic/src/main/kotlin/util/NamespaceUtils.kt**: パッケージ名のプレフィクス
-- **ios/xcconfigs/ios-app.xcconfig**: `PRODUCT_NAME`, `PRODUCT_BUNDLE_IDENTIFIER`
-- **Kotlinソースファイル**: `package` 宣言とディレクトリ構造
-- **strings.xml**: アプリ名
-
-## 技術スタック
-
-- **Android**: Kotlin Multiplatform, Jetpack Compose
-- **iOS**: Tuist, SwiftUI
-- **ビルドシステム**: Gradle (Composite Build), Tuist
-- **テンプレートエンジン**: Cookiecutter
-
-## テンプレートのカスタマイズ
-
-テンプレートをカスタマイズする場合は、以下のファイルを編集してください：
-
-- `cookiecutter-kmp-mobile-tuist/cookiecutter.json`: 変数定義とデフォルト値
-- `cookiecutter-kmp-mobile-tuist/hooks/pre_gen_project.py`: 生成前のバリデーション
-- `cookiecutter-kmp-mobile-tuist/hooks/post_gen_project.py`: 生成後の処理
-- `cookiecutter-kmp-mobile-tuist/{{cookiecutter.project_name}}/`: テンプレートファイル本体
-
-## Sample Project から Template への同期
-
-`sample-project/`への変更を`cookiecutter-kmp-mobile-tuist/{{cookiecutter.project_name}}/`に自動的に反映するツールが用意されています。
-
-### 手動同期
-
+### create project
 ```bash
-# 最新の変更を同期
-./scripts/sync-sample-to-template.sh
+# Create test project (interactive)
+./kmp-mobile-tuist create
 
-# ドライランモード(確認のみ)
-./scripts/sync-sample-to-template.sh --dry-run
-
-# 詳細ログ付き
-./scripts/sync-sample-to-template.sh --verbose
+# Create test project (non-interactive)
+./kmp-mobile-tuist create \
+  --project-name TestApp \
+  --bundle-id com.test.app \
+  --no-input
 ```
 
-### 自動同期
+# Development
 
-`main`ブランチへの`sample-project/**`の変更がpushされると、GitHub Actionsが自動的に同期を実行します。
+This is a Cookiecutter-based template repository for generating Kotlin Multiplatform (KMP) + Tuist mobile projects. The repository contains:
+- A reference implementation (`sample-project/`)
+- A Cookiecutter template (`cookiecutter-kmp-mobile-tuist/`)
+- A CLI wrapper script (`kmp-mobile-tuist`)
 
-**重要**: このツールはJinja2テンプレート変数(`{{ cookiecutter.* }}`)を自動的に保護し、誤って上書きすることを防ぎます。
+## 仕組み
+```
+% ./kmp-mobile-tuist --help
+kmp-mobile-tuist - CLI tool for creating KMP + Tuist mobile projects
 
-### 行単位の保護（マーカー機能）
+Usage:
+  kmp-mobile-tuist create [OPTIONS]
 
-ファイル全体ではなく、特定の行やセクションだけを保護したい場合は、以下のマーカーを使用できます：
+Commands:
+  create              Create a new KMP + Tuist project from template
+  --help, -h          Show this help message
 
-```kotlin
-// インラインマーカー（1行保護）
-package {{ cookiecutter.bundle_id_prefix }} // COOKIECUTTER_KEEP
+Options for 'create':
+  --project-name NAME         Project name (default: App)
+  --bundle-id ID              Bundle ID prefix (default: com.example.app)
+  --android-app-name NAME     Android app name (default: same as project-name)
+  --ios-app-name NAME         iOS app name (default: same as project-name)
+  --output-dir DIR            Output directory (default: current directory)
+  --no-input                  Use default values without prompting
 
-// セクションマーカー（複数行保護）
-// COOKIECUTTER_PROTECTED_START
-package {{ cookiecutter.bundle_id_prefix }}
-import {{ cookiecutter.project_name|lower }}.generated.resources.Res
-// COOKIECUTTER_PROTECTED_END
+Examples:
+  # Interactive mode
+  kmp-mobile-tuist create
+
+  # With arguments
+  kmp-mobile-tuist create --project-name MyApp --bundle-id com.mycompany.myapp
+
+  # Non-interactive mode
+  kmp-mobile-tuist create --project-name MyApp --bundle-id com.mycompany.myapp --no-input
 ```
 
-マーカーを使用すると、保護された行はそのまま保持され、それ以外の行はsample-projectから同期されます。
+##  sample-projectの変更をcookiecutter-kmp-mobile-tuistに反映
 
-詳細は[クイックスタートガイド](./specs/001-sample-to-template-sync/quickstart.md)を参照してください。
+###  ./scripts/sync-sample-to-template.sh --help 
+```
+使用方法: sync-sample-to-template.sh [OPTIONS]
+
+sample-projectの変更をCookiecutterテンプレートに同期します。
+Jinja2テンプレート変数を保護し、誤って上書きすることを防ぎます。
+
+オプション:
+  --dry-run          実際には変更せず、同期内容のみ表示
+  --commit HASH      変更検出のコミット範囲を指定 (デフォルト: HEAD~1..HEAD)
+  --working-tree     未コミットの変更(working tree)を同期対象にする
+  --verbose          詳細ログを出力
+  --help             このヘルプを表示
+
+終了コード:
+  0  成功 (全ファイル同期完了 or dry-run)
+  1  一部失敗 (スキップを除く)
+  2  全失敗 or 設定エラー
+
+例:
+  # 最新のコミットからの変更を同期
+  ./scripts/sync-sample-to-template.sh
+
+  # ドライランモード
+  ./scripts/sync-sample-to-template.sh --dry-run
+
+  # 特定のコミット範囲を指定
+  ./scripts/sync-sample-to-template.sh --commit main..HEAD
+
+  # 未コミットの変更を同期
+  ./scripts/sync-sample-to-template.sh --working-tree
+
+  # 詳細ログ付きで実行
+  ./scripts/sync-sample-to-template.sh --verbose
+```
+
+### github action
+`.github/sync-sample-to-template.yml`
