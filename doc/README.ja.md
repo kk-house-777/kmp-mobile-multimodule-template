@@ -1,17 +1,13 @@
 # kmp-multimodule-template
+KMPを使ったiOS, Andoridのマルチモジュール構成のtemplateアプリを作成する。
+## 要件
+- iOSプロジェクトの管理はtuistが前提
 
-[日本語版README](./doc/README.ja.md)
-
-Create a multimodule template application for iOS and Android using KMP (Kotlin Multiplatform).
-
-## Requirements
-- iOS project management is based on Tuist
-
-## Prerequisites
+## 前提
 - [mise](https://github.com/jdx/mise)
 
-## Usage
-### Quick Start
+## 使い方
+### クイックスタート
 ```bash
 # Install dependencies
 mise install
@@ -27,7 +23,7 @@ mise install
 mise run ios-gen
 ```
 
-### Create Project
+### create project
 ```bash
 # Create test project (interactive)
 ./kmp-mobile-tuist create
@@ -46,7 +42,7 @@ This is a Cookiecutter-based template repository for generating Kotlin Multiplat
 - A Cookiecutter template (`cookiecutter-kmp-mobile-tuist/`)
 - A CLI wrapper script (`kmp-mobile-tuist`)
 
-## How It Works
+## 仕組み
 ```
 % ./kmp-mobile-tuist --help
 kmp-mobile-tuist - CLI tool for creating KMP + Tuist mobile projects
@@ -77,43 +73,43 @@ Examples:
   kmp-mobile-tuist create --project-name MyApp --bundle-id com.mycompany.myapp --no-input
 ```
 
-## Syncing Changes from sample-project to cookiecutter-kmp-mobile-tuist
+##  sample-projectの変更をcookiecutter-kmp-mobile-tuistに反映
 
-### ./scripts/sync-sample-to-template.sh --help
+###  ./scripts/sync-sample-to-template.sh --help 
 ```
-Usage: sync-sample-to-template.sh [OPTIONS]
+使用方法: sync-sample-to-template.sh [OPTIONS]
 
-Sync changes from sample-project to Cookiecutter template.
-Protects Jinja2 template variables to prevent accidental overwrites.
+sample-projectの変更をCookiecutterテンプレートに同期します。
+Jinja2テンプレート変数を保護し、誤って上書きすることを防ぎます。
 
-Options:
-  --dry-run          Display sync contents without making changes
-  --commit HASH      Specify commit range for change detection (default: HEAD~1..HEAD)
-  --working-tree     Sync uncommitted changes (working tree)
-  --verbose          Output detailed logs
-  --help             Display this help
+オプション:
+  --dry-run          実際には変更せず、同期内容のみ表示
+  --commit HASH      変更検出のコミット範囲を指定 (デフォルト: HEAD~1..HEAD)
+  --working-tree     未コミットの変更(working tree)を同期対象にする
+  --verbose          詳細ログを出力
+  --help             このヘルプを表示
 
-Exit codes:
-  0  Success (all files synced or dry-run)
-  1  Partial failure (excluding skips)
-  2  Complete failure or configuration error
+終了コード:
+  0  成功 (全ファイル同期完了 or dry-run)
+  1  一部失敗 (スキップを除く)
+  2  全失敗 or 設定エラー
 
-Examples:
-  # Sync changes from the latest commit
+例:
+  # 最新のコミットからの変更を同期
   ./scripts/sync-sample-to-template.sh
 
-  # Dry run mode
+  # ドライランモード
   ./scripts/sync-sample-to-template.sh --dry-run
 
-  # Specify a commit range
+  # 特定のコミット範囲を指定
   ./scripts/sync-sample-to-template.sh --commit main..HEAD
 
-  # Sync uncommitted changes
+  # 未コミットの変更を同期
   ./scripts/sync-sample-to-template.sh --working-tree
 
-  # Run with verbose logging
+  # 詳細ログ付きで実行
   ./scripts/sync-sample-to-template.sh --verbose
 ```
 
-### GitHub Action
+### github action
 `.github/sync-sample-to-template.yml`
