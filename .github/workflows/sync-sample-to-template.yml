@@ -1,0 +1,144 @@
+name: Sync Sample Project to Template
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'sample-project/**'
+  pull_request:
+    paths:
+      - 'sample-project/**'
+  workflow_dispatch:
+
+# 追加: 同じPRで連続pushがあった場合、古い実行をキャンセルする
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # PR用: Dry-run
+      - name: Run sync script (dry-run for PR)
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "::group::Dry-run sync preview"
+          ./scripts/sync-sample-to-template.sh --dry-run --verbose
+          echo "::endgroup::"
+
+      # Push用: Actual sync
+      - name: Run sync script (actual sync for push to main)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "::group::Synchronizing sample-project to template"
+          ./scripts/sync-sample-to-template.sh --verbose
+          echo "::endgroup::"
+
+      - name: Check for changes
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes to commit"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected"
+          fi
+
+      - name: Commit and push changes
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git add cookiecutter-kmp-mobile-tuist/
+          git commit -m "chore: sync sample-project changes to template [skip ci]
+
+          Automated synchronization from sample-project/ to template.
+          Triggered by: ${{ github.event_name }}
+          Commit: ${{ github.sha }}"
+          git push
+
+      - name: Add or Update PR comment with sync preview
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+
+            // Run sync in dry-run
+            let syncOutput;
+            try {
+              syncOutput = execSync('./scripts/sync-sample-to-template.sh --dry-run', {
+                encoding: 'utf-8',
+                cwd: process.env.GITHUB_WORKSPACE
+              });
+            } catch (error) {
+              syncOutput = error.stdout + error.stderr;
+            }
+
+            // 出力が長すぎる場合の切り詰め処理（GitHubコメントの上限対策）
+            if (syncOutput.length > 60000) {
+              syncOutput = syncOutput.substring(0, 60000) + "\n... (output truncated)";
+            }
+
+            const header = '## 🔄 Template Sync Preview';
+            const body = `${header}
+
+            このPRが sample-project/ 配下のファイルを変更しています。
+            以下は、mainにマージされた際にtemplateに反映される変更のプレビューです:
+
+            <details>
+            <summary>同期プレビュー (dry-run)</summary>
+
+            \`\`\`
+            ${syncOutput}
+            \`\`\`
+
+            </details>
+
+            **Note**: このPRがマージされると、変更は自動的にCookiecutterテンプレートに同期されます。
+            `;
+
+            // 既存のコメントを探す
+            const { data: comments } = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const botComment = comments.find(comment => {
+              return comment.user.type === 'Bot' && comment.body.includes(header);
+            });
+
+            // 更新または新規作成
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                comment_id: botComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }
