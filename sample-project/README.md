@@ -1,3 +1,5 @@
+test
+
 # Sample Project - KMP + Tuist Multiplatform App
 
 > [日本語版はこちら / Japanese version](./doc/README.ja.md)
