@@ -115,13 +115,18 @@ function create_project() {
         cookiecutter_cmd="$cookiecutter_cmd --no-input"
     fi
 
+    if [[ "$output_dir" != "." ]]; then
+        cookiecutter_cmd="$cookiecutter_cmd --output-dir \"$output_dir\""
+    fi
+
+    # Build extra context as positional arguments (key=value format)
     if [[ -n "$project_name" ]]; then
         extra_context="project_name=$project_name"
     fi
 
     if [[ -n "$bundle_id" ]]; then
         if [[ -n "$extra_context" ]]; then
-            extra_context="$extra_context,bundle_id_prefix=$bundle_id"
+            extra_context="$extra_context bundle_id_prefix=$bundle_id"
         else
             extra_context="bundle_id_prefix=$bundle_id"
         fi
@@ -129,7 +134,7 @@ function create_project() {
 
     if [[ -n "$android_app_name" ]]; then
         if [[ -n "$extra_context" ]]; then
-            extra_context="$extra_context,android_app_name=$android_app_name"
+            extra_context="$extra_context android_app_name=$android_app_name"
         else
             extra_context="android_app_name=$android_app_name"
         fi
@@ -137,24 +142,16 @@ function create_project() {
 
     if [[ -n "$ios_app_name" ]]; then
         if [[ -n "$extra_context" ]]; then
-            extra_context="$extra_context,ios_app_name=$ios_app_name"
+            extra_context="$extra_context ios_app_name=$ios_app_name"
         else
             extra_context="ios_app_name=$ios_app_name"
         fi
     fi
 
-    if [[ -n "$extra_context" ]]; then
-        cookiecutter_cmd="$cookiecutter_cmd --extra-context '$extra_context'"
-    fi
-
-    if [[ "$output_dir" != "." ]]; then
-        cookiecutter_cmd="$cookiecutter_cmd --output-dir \"$output_dir\""
-    fi
-
     # Run cookiecutter
     echo -e "${GREEN}Creating new KMP + Tuist project...${NC}"
     echo ""
-    eval "$cookiecutter_cmd"
+    eval "$cookiecutter_cmd $extra_context"
 }
 
 # Main script logic

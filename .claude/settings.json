@@ -3,7 +3,7 @@
     "deny": [
       "Read(~/.ssh/**)",
       "Read(~/.zshrc)",
-      "Bash(rm -rf*)",
+      "Bash(rm -rf:*)",
       "Bash(rm -rf /)",
       "Bash(rm -rf ~)",
       "Bash(rm -rf /*)",
