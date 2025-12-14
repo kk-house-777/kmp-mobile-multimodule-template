@@ -1,5 +1,5 @@
 # kmp-multimodule-template
-KMPを使ったiOS, Andoridのマルチモジュール構成のtemplateアプリを作成する。
+KMPを使ったiOS, Androidのマルチモジュール構成のtemplateアプリを作成する。
 ## 要件
 - iOSプロジェクトの管理はtuistが前提
 
