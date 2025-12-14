@@ -4,3 +4,5 @@
 
 # 諸注意
 - sample-projectを編集する場合、明確な指示がなければ cookiecutter-kmp-mobile-tuist 配下への変更は不要。
+
+# テストの実行
