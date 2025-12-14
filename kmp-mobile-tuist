@@ -4,7 +4,9 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TEMPLATE_DIR="$SCRIPT_DIR/cookiecutter-kmp-mobile-tuist"
+#TEMPLATE_DIR="$SCRIPT_DIR/cookiecutter-kmp-mobile-tuist"
+TEMPLATE_REPO="https://github.com/kk-house-777/kmp-mobile-tuist-template.git"
+TEMPLATE_DIR="cookiecutter-kmp-mobile-tuist"
 
 # Color codes for output
 RED='\033[0;31m'
@@ -106,7 +108,8 @@ function create_project() {
     check_cookiecutter
 
     # Build cookiecutter command
-    local cookiecutter_cmd="cookiecutter \"$TEMPLATE_DIR\""
+#    local cookiecutter_cmd="cookiecutter \"$TEMPLATE_DIR\""
+    local cookiecutter_cmd="cookiecutter \"$TEMPLATE_REPO\" --directory \"$TEMPLATE_DIR\""
 
     if [[ "$no_input" == true ]]; then
         cookiecutter_cmd="$cookiecutter_cmd --no-input"
