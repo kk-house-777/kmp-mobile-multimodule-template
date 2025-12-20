@@ -4,8 +4,8 @@ let bundleId = "$(PRODUCT_BUNDLE_IDENTIFIER)"
 let project = Project(
     name: "ios-app",
     settings: .settings(configurations: [
-        .debug(name: "Debug", xcconfig: "./xcconfigs/ios-app.xcconfig"),
-        .release(name: "Release", xcconfig: "./xcconfigs/ios-app.xcconfig"),
+        .debug(name: "Debug", xcconfig: "./xcconfigs/ios-app-debug.xcconfig"),
+        .release(name: "Release", xcconfig: "./xcconfigs/ios-app-release.xcconfig"),
     ]),
     targets: [
         .target(
