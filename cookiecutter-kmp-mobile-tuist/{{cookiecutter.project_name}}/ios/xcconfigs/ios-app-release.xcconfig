@@ -1,0 +1,4 @@
+#include "ios-app.xcconfig"
+
+PRODUCT_NAME={{ cookiecutter.ios_app_name }}
+PRODUCT_BUNDLE_IDENTIFIER={{ cookiecutter.bundle_id_prefix }}.{{ cookiecutter.ios_app_name }}

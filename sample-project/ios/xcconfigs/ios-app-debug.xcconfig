@@ -1,0 +1,4 @@
+#include "ios-app.xcconfig"
+
+PRODUCT_NAME=App (Debug)
+PRODUCT_BUNDLE_IDENTIFIER=kk.tuist.app.debug
