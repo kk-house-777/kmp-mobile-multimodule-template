@@ -32,7 +32,7 @@ let project = Project(
         .target(
             name: "KMPFramework",
             destinations: .iOS,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "\(bundleId).kmp.framework",
             sources: ["KMPFramework/**"],
             scripts: [
@@ -52,7 +52,7 @@ let project = Project(
         .target(
             name: "Feature",
             destinations: .iOS,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "\(bundleId).feature",
             sources: ["Feature/**"],
             dependencies: [
