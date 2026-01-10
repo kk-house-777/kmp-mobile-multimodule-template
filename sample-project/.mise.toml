@@ -1,5 +1,5 @@
 [tools]
-tuist = "4.109.2"
+tuist = "4.121.0"
 
 [tasks.ios-gen]
 description = "Generate an iOS project"
