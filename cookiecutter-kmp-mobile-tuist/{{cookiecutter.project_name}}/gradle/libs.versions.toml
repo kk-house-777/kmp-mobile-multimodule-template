@@ -1,7 +1,7 @@
 [versions]
 androidGradlePlugin = "8.13.1"
 kotlin = "2.2.21"
-jetbrainsCompose = "1.9.3"
+jetbrainsCompose = "1.10.1"
 metro = "0.8.2"
 skie = "0.10.8"
 
